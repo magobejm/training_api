@@ -1,0 +1,39 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.StartWorkoutSessionUseCase = void 0;
+const common_1 = require("@nestjs/common");
+const session_repository_1 = require("../domain/session.repository");
+const workout_session_entity_1 = require("../domain/workout-session.entity");
+let StartWorkoutSessionUseCase = class StartWorkoutSessionUseCase {
+    sessionRepository;
+    constructor(sessionRepository) {
+        this.sessionRepository = sessionRepository;
+    }
+    async execute(command) {
+        const activeSession = await this.sessionRepository.findActiveSessionByUser(command.userId);
+        if (activeSession) {
+            return activeSession;
+        }
+        const session = workout_session_entity_1.WorkoutSession.start(command.userId, command.trainingDayId);
+        return this.sessionRepository.createSession(session);
+    }
+};
+exports.StartWorkoutSessionUseCase = StartWorkoutSessionUseCase;
+exports.StartWorkoutSessionUseCase = StartWorkoutSessionUseCase = __decorate([
+    (0, common_1.Injectable)(),
+    __param(0, (0, common_1.Inject)(session_repository_1.ISessionRepository)),
+    __metadata("design:paramtypes", [Object])
+], StartWorkoutSessionUseCase);
+//# sourceMappingURL=start-workout-session.usecase.js.map

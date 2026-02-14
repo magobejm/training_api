@@ -1,0 +1,357 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  TRAINER
+  CLIENT
+}
+
+model Organization {
+  id   String @id @default(uuid())
+  name String
+
+  // Audit fields
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdBy String?  @map("created_by")
+  updatedBy String?  @map("updated_by")
+
+  // Soft delete
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy String?   @map("deleted_by")
+
+  users User[]
+
+  @@map("organizations")
+}
+
+model User {
+  id       String  @id @default(uuid())
+  email    String  @unique
+  password String? @map("password_hash")
+  role     Role
+
+  organizationId String?       @map("organization_id")
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
+  // Relations
+  trainingPlans            TrainingPlan[]
+  workoutSessions          WorkoutSession[]
+  bodyMetrics              BodyMetric[]
+  progressPhotos           ProgressPhoto[]
+  clientConsultations      Consultation[]     @relation("ClientConsultations")
+  trainerConsultations     Consultation[]     @relation("TrainerConsultations")
+  messages                 Message[]
+  userScheduledWorkouts    ScheduledWorkout[] @relation("UserScheduledWorkouts")
+  trainerScheduledWorkouts ScheduledWorkout[] @relation("TrainerScheduledWorkouts")
+
+  // Audit fields
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdBy String?  @map("created_by")
+  updatedBy String?  @map("updated_by")
+
+  // Soft delete
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy String?   @map("deleted_by")
+
+  // Password Reset
+  resetToken        String?   @unique @map("reset_token")
+  resetTokenExpires DateTime? @map("reset_token_expires")
+
+  @@map("users")
+}
+
+model Exercise {
+  id              String  @id @default(uuid())
+  name            String
+  description     String
+  defaultVideoUrl String? @map("default_video_url")
+  defaultImageUrl String? @map("default_image_url") // Cloudinary URL
+  thumbnailUrl    String? @map("thumbnail_url") // Optional thumbnail
+  muscleGroup     String  @map("muscle_group")
+
+  // Audit fields
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdBy String?  @map("created_by")
+  updatedBy String?  @map("updated_by")
+
+  // Soft delete
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy String?   @map("deleted_by")
+
+  // Relations
+  dayExercises DayExercise[]
+
+  @@map("exercises")
+}
+
+model TrainingPlan {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+
+  authorId String @map("author_id")
+  author   User   @relation(fields: [authorId], references: [id])
+
+  // Audit fields
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdBy String?  @map("created_by")
+  updatedBy String?  @map("updated_by")
+
+  // Soft delete
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy String?   @map("deleted_by")
+
+  // Relations
+  days TrainingDay[]
+
+  @@index([authorId])
+  @@map("training_plans")
+}
+
+model TrainingDay {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  order       Int
+
+  planId String @map("plan_id")
+
+  // Relations
+  plan              TrainingPlan       @relation(fields: [planId], references: [id])
+  exercises         DayExercise[]
+  workoutSessions   WorkoutSession[]
+  scheduledWorkouts ScheduledWorkout[]
+
+  // Audit
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([planId, order])
+  @@index([planId])
+  @@map("training_days")
+}
+
+model DayExercise {
+  id String @id @default(uuid())
+
+  dayId String      @map("day_id")
+  day   TrainingDay @relation(fields: [dayId], references: [id])
+
+  exerciseId String   @map("exercise_id")
+  exercise   Exercise @relation(fields: [exerciseId], references: [id])
+
+  order Int
+
+  // Overrides
+  customDescription String? @map("custom_description")
+  customVideoUrl    String? @map("custom_video_url")
+  customImageUrl    String? @map("custom_image_url") // Cloudinary override
+  coachNotes        String? @map("coach_notes")
+
+  // Prescription
+  targetSets  Int    @map("target_sets")
+  targetReps  String @map("target_reps") // String to allow ranges "10-12"
+  targetRir   Int?   @map("target_rir")
+  restSeconds Int    @map("rest_seconds")
+
+  // Audit fields
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdBy String?  @map("created_by")
+  updatedBy String?  @map("updated_by")
+
+  // Soft delete
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy String?   @map("deleted_by")
+
+  // Relations
+  workoutSets WorkoutSet[]
+
+  @@index([dayId])
+  @@index([exerciseId])
+  @@map("day_exercises")
+}
+
+enum SessionStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+}
+
+model WorkoutSession {
+  id            String @id @default(uuid())
+  userId        String @map("user_id")
+  trainingDayId String @map("training_day_id")
+
+  status      SessionStatus @default(IN_PROGRESS)
+  startedAt   DateTime      @map("started_at")
+  completedAt DateTime?     @map("completed_at")
+
+  totalVolume     Float? @map("total_volume") // Calculado
+  durationSeconds Int?   @map("duration_seconds") // Calculado
+
+  // Audit
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user        User         @relation(fields: [userId], references: [id])
+  trainingDay TrainingDay  @relation(fields: [trainingDayId], references: [id])
+  sets        WorkoutSet[]
+
+  @@index([userId])
+  @@index([trainingDayId])
+  @@index([status])
+  @@map("workout_sessions")
+}
+
+model WorkoutSet {
+  id            String @id @default(uuid())
+  sessionId     String @map("session_id")
+  dayExerciseId String @map("day_exercise_id")
+
+  setIndex   Int   @map("set_index") // 1-based
+  weightDone Float @map("weight_done") // kg decimal
+  repsDone   Int   @map("reps_done")
+  rpeDone    Int?  @map("rpe_done") // 1-10, opcional
+
+  restStartedAt   DateTime? @map("rest_started_at")
+  restCompletedAt DateTime? @map("rest_completed_at")
+
+  // Audit
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  session     WorkoutSession @relation(fields: [sessionId], references: [id])
+  dayExercise DayExercise    @relation(fields: [dayExerciseId], references: [id])
+
+  @@unique([sessionId, dayExerciseId, setIndex]) // Idempotencia
+  @@index([sessionId])
+  @@map("workout_sets")
+}
+
+model BodyMetric {
+  id     String @id @default(uuid())
+  userId String @map("user_id")
+
+  weight       Float // kg, obligatorio
+  height       Float? // cm, obligatorio en primer registro
+  bodyFat      Float?  @map("body_fat") // %, opcional
+  measurements Json? // { chest, waist, hips, etc. }
+  notes        String?
+
+  loggedAt DateTime @default(now()) @map("logged_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([loggedAt])
+  @@map("body_metrics")
+}
+
+model ProgressPhoto {
+  id     String @id @default(uuid())
+  userId String @map("user_id")
+
+  imageUrl String   @map("image_url") // Cloudinary
+  caption  String?
+  loggedAt DateTime @default(now()) @map("logged_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([loggedAt])
+  @@map("progress_photos")
+}
+
+enum ConsultationStatus {
+  OPEN
+  RESOLVED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model Consultation {
+  id        String @id @default(uuid())
+  clientId  String @map("client_id")
+  trainerId String @map("trainer_id")
+
+  subject  String
+  status   ConsultationStatus @default(OPEN)
+  priority Priority           @default(MEDIUM)
+
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  resolvedAt DateTime? @map("resolved_at")
+
+  // Relations
+  client   User      @relation("ClientConsultations", fields: [clientId], references: [id])
+  trainer  User      @relation("TrainerConsultations", fields: [trainerId], references: [id])
+  messages Message[]
+
+  @@index([clientId])
+  @@index([trainerId])
+  @@index([status])
+  @@map("consultations")
+}
+
+model Message {
+  id             String @id @default(uuid())
+  consultationId String @map("consultation_id")
+  senderId       String @map("sender_id")
+
+  content String    @db.Text
+  readAt  DateTime? @map("read_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  consultation Consultation @relation(fields: [consultationId], references: [id])
+  sender       User         @relation(fields: [senderId], references: [id])
+
+  @@index([consultationId])
+  @@index([senderId])
+  @@map("messages")
+}
+
+model ScheduledWorkout {
+  id            String @id @default(uuid())
+  userId        String @map("user_id")
+  trainerId     String @map("trainer_id")
+  trainingDayId String @map("training_day_id")
+
+  scheduledFor DateTime @map("scheduled_for")
+  reminderSent Boolean  @default(false) @map("reminder_sent")
+  completed    Boolean  @default(false)
+  notes        String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user        User        @relation("UserScheduledWorkouts", fields: [userId], references: [id])
+  trainer     User        @relation("TrainerScheduledWorkouts", fields: [trainerId], references: [id])
+  trainingDay TrainingDay @relation(fields: [trainingDayId], references: [id])
+
+  @@index([userId])
+  @@index([trainerId])
+  @@index([scheduledFor])
+  @@map("scheduled_workouts")
+}

@@ -1,0 +1,45 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.UpdateExerciseUseCase = void 0;
+const common_1 = require("@nestjs/common");
+const exercise_repository_1 = require("../domain/exercise.repository");
+let UpdateExerciseUseCase = class UpdateExerciseUseCase {
+    exerciseRepository;
+    constructor(exerciseRepository) {
+        this.exerciseRepository = exerciseRepository;
+    }
+    async execute(input) {
+        const { id, data, userId } = input;
+        const exercise = await this.exerciseRepository.findById(id);
+        if (!exercise) {
+            throw new common_1.NotFoundException(`Exercise with ID ${id} not found`);
+        }
+        if (exercise.createdBy !== userId) {
+            throw new common_1.ForbiddenException('You do not have permission to update this exercise');
+        }
+        const updatedExercise = await this.exerciseRepository.update(id, {
+            ...data,
+            updatedBy: userId,
+        });
+        return updatedExercise;
+    }
+};
+exports.UpdateExerciseUseCase = UpdateExerciseUseCase;
+exports.UpdateExerciseUseCase = UpdateExerciseUseCase = __decorate([
+    (0, common_1.Injectable)(),
+    __param(0, (0, common_1.Inject)(exercise_repository_1.IExerciseRepository)),
+    __metadata("design:paramtypes", [Object])
+], UpdateExerciseUseCase);
+//# sourceMappingURL=update-exercise.usecase.js.map
