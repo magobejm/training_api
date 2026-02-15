@@ -32,6 +32,10 @@ let PrismaExerciseRepository = class PrismaExerciseRepository {
                 updatedAt: exercise.updatedAt,
                 createdBy: exercise.createdBy,
                 updatedBy: exercise.updatedBy,
+                muscleGroupId: exercise.muscleGroupDetails?.id,
+            },
+            include: {
+                targetMuscleGroup: true,
             },
         });
         return this.mapToDomain(raw);
@@ -39,12 +43,18 @@ let PrismaExerciseRepository = class PrismaExerciseRepository {
     async findAll() {
         const raw = await this.prisma.exercise.findMany({
             where: { deletedAt: null },
+            include: {
+                targetMuscleGroup: true,
+            },
         });
         return raw.map((item) => this.mapToDomain(item));
     }
     async findById(id) {
         const raw = await this.prisma.exercise.findUnique({
             where: { id },
+            include: {
+                targetMuscleGroup: true,
+            },
         });
         if (!raw || raw.deletedAt)
             return null;
@@ -63,6 +73,9 @@ let PrismaExerciseRepository = class PrismaExerciseRepository {
                 updatedAt: new Date(),
                 updatedBy: data.updatedBy,
             },
+            include: {
+                targetMuscleGroup: true,
+            },
         });
         return this.mapToDomain(raw);
     }
@@ -80,6 +93,9 @@ let PrismaExerciseRepository = class PrismaExerciseRepository {
                 id: { in: ids },
                 deletedAt: null,
             },
+            include: {
+                targetMuscleGroup: true,
+            },
         });
         return raw.map((item) => this.mapToDomain(item));
     }
@@ -93,7 +109,11 @@ let PrismaExerciseRepository = class PrismaExerciseRepository {
         return count > 0;
     }
     mapToDomain(raw) {
-        return new exercise_entity_1.Exercise(raw.id, raw.name, raw.description, raw.muscleGroup, raw.defaultVideoUrl, raw.defaultImageUrl, raw.thumbnailUrl, raw.createdAt, raw.updatedAt, raw.createdBy, raw.updatedBy, raw.deletedAt, raw.deletedBy);
+        return new exercise_entity_1.Exercise(raw.id, raw.name, raw.description, raw.muscleGroup, raw.defaultVideoUrl, raw.defaultImageUrl, raw.thumbnailUrl, raw.createdAt, raw.updatedAt, raw.createdBy, raw.updatedBy, raw.deletedAt, raw.deletedBy, raw.targetMuscleGroup ? {
+            id: raw.targetMuscleGroup.id,
+            name: raw.targetMuscleGroup.name,
+            imageUrl: raw.targetMuscleGroup.imageUrl
+        } : undefined);
     }
 };
 exports.PrismaExerciseRepository = PrismaExerciseRepository;

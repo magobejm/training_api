@@ -30,9 +30,17 @@ let UsersController = class UsersController {
             select: {
                 id: true,
                 email: true,
-                role: true,
+                userRole: {
+                    select: {
+                        id: true,
+                        name: true,
+                        description: true,
+                    }
+                },
                 createdAt: true,
                 updatedAt: true,
+                name: true,
+                avatarUrl: true,
                 activePlan: {
                     select: {
                         id: true,
@@ -41,7 +49,11 @@ let UsersController = class UsersController {
                 },
             },
         });
-        return users;
+        return users.map(user => ({
+            ...user,
+            role: user.userRole,
+            userRole: undefined,
+        }));
     }
     async findOne(id) {
         const user = await this.prisma.user.findUnique({
@@ -49,10 +61,25 @@ let UsersController = class UsersController {
             select: {
                 id: true,
                 email: true,
-                role: true,
+                userRole: {
+                    select: {
+                        id: true,
+                        name: true,
+                        description: true,
+                    }
+                },
                 createdAt: true,
                 updatedAt: true,
                 deletedAt: true,
+                name: true,
+                avatarUrl: true,
+                birthDate: true,
+                gender: true,
+                height: true,
+                weight: true,
+                maxHeartRate: true,
+                restingHeartRate: true,
+                leanMass: true,
                 activePlan: {
                     select: {
                         id: true,
@@ -65,19 +92,39 @@ let UsersController = class UsersController {
         if (!user || user.deletedAt) {
             throw new common_1.NotFoundException('User not found');
         }
-        return user;
+        return {
+            ...user,
+            role: user.userRole,
+            userRole: undefined,
+        };
     }
     async updateProfile(user, body) {
         return this.prisma.user.update({
             where: { id: user.userId },
             data: {
                 avatarUrl: body.avatarUrl,
+                name: body.name,
+                birthDate: body.birthDate ? new Date(body.birthDate) : undefined,
+                gender: body.gender,
+                height: body.height,
+                weight: body.weight,
+                maxHeartRate: body.maxHeartRate,
+                restingHeartRate: body.restingHeartRate,
+                leanMass: body.leanMass,
             },
             select: {
                 id: true,
                 email: true,
                 role: true,
                 avatarUrl: true,
+                name: true,
+                birthDate: true,
+                gender: true,
+                height: true,
+                weight: true,
+                maxHeartRate: true,
+                restingHeartRate: true,
+                leanMass: true,
             },
         });
     }
@@ -103,6 +150,35 @@ let UsersController = class UsersController {
                     }
                 }
             }
+        });
+    }
+    async update(id, body) {
+        return this.prisma.user.update({
+            where: { id },
+            data: {
+                name: body.name,
+                birthDate: body.birthDate ? new Date(body.birthDate) : undefined,
+                gender: body.gender,
+                height: body.height,
+                weight: body.weight,
+                maxHeartRate: body.maxHeartRate,
+                restingHeartRate: body.restingHeartRate,
+                leanMass: body.leanMass,
+            },
+            select: {
+                id: true,
+                email: true,
+                role: true,
+                avatarUrl: true,
+                name: true,
+                birthDate: true,
+                gender: true,
+                height: true,
+                weight: true,
+                maxHeartRate: true,
+                restingHeartRate: true,
+                leanMass: true,
+            },
         });
     }
     async softDelete(id, req) {
@@ -147,6 +223,14 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "assignPlan", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),

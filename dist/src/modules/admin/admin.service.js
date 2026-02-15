@@ -63,11 +63,13 @@ let AdminService = class AdminService {
             throw new common_1.BadRequestException('Email already exists');
         }
         const hashedPassword = await bcrypt.hash(password, 10);
+        const roleRecord = await this.prisma.role.findUnique({ where: { name: 'TRAINER' } });
         const user = await this.prisma.user.create({
             data: {
                 email,
                 password: hashedPassword,
-                role: client_1.Role.TRAINER,
+                role: client_1.RoleEnum.TRAINER,
+                roleId: roleRecord?.id,
             },
         });
         const { password: _, ...result } = user;
@@ -76,7 +78,7 @@ let AdminService = class AdminService {
     async getAllTrainers() {
         return this.prisma.user.findMany({
             where: {
-                role: client_1.Role.TRAINER,
+                role: client_1.RoleEnum.TRAINER,
                 deletedAt: null,
             },
             select: {
@@ -92,7 +94,7 @@ let AdminService = class AdminService {
     }
     async deleteTrainer(id) {
         const user = await this.prisma.user.findUnique({ where: { id } });
-        if (!user || user.role !== client_1.Role.TRAINER) {
+        if (!user || user.role !== client_1.RoleEnum.TRAINER) {
             throw new common_1.NotFoundException('Trainer not found');
         }
         return this.prisma.user.update({
@@ -105,7 +107,7 @@ let AdminService = class AdminService {
     }
     async resetTrainerPassword(id, newPassword) {
         const user = await this.prisma.user.findUnique({ where: { id } });
-        if (!user || user.role !== client_1.Role.TRAINER) {
+        if (!user || user.role !== client_1.RoleEnum.TRAINER) {
             throw new common_1.NotFoundException('Trainer not found');
         }
         const hashedPassword = await bcrypt.hash(newPassword, 10);

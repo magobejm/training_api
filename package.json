@@ -19,9 +19,10 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
+    "seed:masters": "ts-node prisma/seeds/masters.seed.ts",
     "seed:users": "ts-node prisma/seeds/users.seed.ts",
     "seed:exercises": "ts-node prisma/seeds/exercises.seed.ts",
-    "seed:all": "npm run seed:users && npm run seed:exercises"
+    "seed:all": "npm run seed:masters && npm run seed:users && npm run seed:exercises"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

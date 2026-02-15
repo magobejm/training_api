@@ -1,5 +1,5 @@
 export declare class ScheduleWorkoutDto {
-    trainerId: string;
+    trainerId?: string;
     clientId?: string;
     trainingDayId: string;
     scheduledFor: string;

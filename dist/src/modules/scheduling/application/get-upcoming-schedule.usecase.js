@@ -24,6 +24,7 @@ let GetUpcomingScheduleUseCase = class GetUpcomingScheduleUseCase {
         return this.repository.findUpcoming(command.userId, {
             startDate: command.startDate,
             endDate: command.endDate,
+            trainerId: command.trainerId,
         });
     }
 };

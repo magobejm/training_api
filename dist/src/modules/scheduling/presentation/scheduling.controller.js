@@ -50,11 +50,15 @@ let SchedulingController = class SchedulingController {
             completed: workout.completed,
             reminderSent: workout.reminderSent,
             notes: workout.notes,
+            clientName: workout.clientName,
+            planName: workout.planName,
+            dayName: workout.dayName,
         };
     }
-    async getUpcoming(query, userId) {
+    async getUpcoming(query, user) {
         const workouts = await this.getUpcomingUseCase.execute({
-            userId,
+            userId: user.userId,
+            trainerId: user.role === 'TRAINER' ? user.userId : undefined,
             startDate: query.startDate ? new Date(query.startDate) : undefined,
             endDate: query.endDate ? new Date(query.endDate) : undefined,
         });
@@ -67,6 +71,9 @@ let SchedulingController = class SchedulingController {
                 completed: w.completed,
                 reminderSent: w.reminderSent,
                 notes: w.notes,
+                clientName: w.clientName,
+                planName: w.planName,
+                dayName: w.dayName,
             })),
             total: workouts.length,
         };
@@ -102,16 +109,16 @@ __decorate([
 __decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Query)()),
-    __param(1, (0, current_user_decorator_1.CurrentUser)('sub')),
+    __param(1, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [scheduling_dto_1.GetScheduleQueryDto, String]),
+    __metadata("design:paramtypes", [scheduling_dto_1.GetScheduleQueryDto, Object]),
     __metadata("design:returntype", Promise)
 ], SchedulingController.prototype, "getUpcoming", null);
 __decorate([
     (0, common_1.Patch)(':workoutId'),
     __param(0, (0, common_1.Param)('workoutId')),
     __param(1, (0, common_1.Body)()),
-    __param(2, (0, current_user_decorator_1.CurrentUser)('sub')),
+    __param(2, (0, current_user_decorator_1.CurrentUser)('userId')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, scheduling_dto_1.RescheduleWorkoutDto, String]),
     __metadata("design:returntype", Promise)
@@ -119,7 +126,7 @@ __decorate([
 __decorate([
     (0, common_1.Delete)(':workoutId'),
     __param(0, (0, common_1.Param)('workoutId')),
-    __param(1, (0, current_user_decorator_1.CurrentUser)('sub')),
+    __param(1, (0, current_user_decorator_1.CurrentUser)('userId')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)

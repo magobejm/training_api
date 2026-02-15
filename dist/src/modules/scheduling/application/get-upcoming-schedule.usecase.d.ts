@@ -7,5 +7,6 @@ export declare class GetUpcomingScheduleUseCase {
         userId: string;
         startDate?: Date;
         endDate?: Date;
+        trainerId?: string;
     }): Promise<ScheduledWorkout[]>;
 }

@@ -1,31 +1,37 @@
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../prisma/prisma.service';
-import { User, Role } from '@prisma/client';
+import { RoleEnum } from '@prisma/client';
 export declare class AuthService {
     private prisma;
     private jwtService;
     constructor(prisma: PrismaService, jwtService: JwtService);
-    validateUser(email: string, pass: string): Promise<User | null>;
-    login(user: User): Promise<{
+    validateUser(email: string, pass: string): Promise<any | null>;
+    login(user: any): Promise<{
         accessToken: string;
         user: {
-            id: string;
-            email: string;
-            name: string | null;
-            role: import("@prisma/client").$Enums.Role;
-            avatarUrl: string | null;
+            id: any;
+            email: any;
+            name: any;
+            role: any;
+            avatarUrl: any;
         };
     }>;
     register(registerDto: {
         email: string;
         password: string;
         name?: string;
-        role: Role;
+        role: RoleEnum;
     }): Promise<{
         id: string;
         email: string;
         name: string | null;
-        role: import("@prisma/client").$Enums.Role;
+        role: {
+            id: string;
+            name: string;
+            createdAt: Date;
+            updatedAt: Date;
+            description: string | null;
+        } | null;
     }>;
     changePassword(userId: string, oldPass: string, newPass: string): Promise<{
         message: string;

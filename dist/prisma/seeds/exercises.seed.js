@@ -166,13 +166,25 @@ const exercises = [
 ];
 async function seedExercises(trainerId) {
     console.log('🌱 Seeding exercises...');
+    const muscleGroups = await prisma.muscleGroup.findMany();
+    const muscleGroupMap = new Map(muscleGroups.map(mg => [mg.name, mg.id]));
+    if (muscleGroupMap.size === 0) {
+        throw new Error('Muscle Groups not found. Run seed:masters first.');
+    }
     for (const exercise of exercises) {
+        const mgId = muscleGroupMap.get(exercise.muscleGroup);
+        if (!mgId) {
+            console.warn(`⚠️ Muscle group not found for exercise: ${exercise.name} (${exercise.muscleGroup})`);
+        }
         await prisma.exercise.upsert({
             where: { id: exercise.name },
-            update: {},
+            update: {
+                muscleGroupId: mgId,
+            },
             create: {
                 ...exercise,
                 createdBy: trainerId,
+                muscleGroupId: mgId,
             },
         });
         console.log(`  ✅ ${exercise.name}`);

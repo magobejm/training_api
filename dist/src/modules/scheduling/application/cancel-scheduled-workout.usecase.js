@@ -25,8 +25,8 @@ let CancelScheduledWorkoutUseCase = class CancelScheduledWorkoutUseCase {
         if (!workout) {
             throw new common_1.NotFoundException('Scheduled workout not found');
         }
-        if (workout.userId !== command.userId) {
-            throw new common_1.ForbiddenException('You can only cancel your own workouts');
+        if (workout.userId !== command.userId && workout.trainerId !== command.userId) {
+            throw new common_1.ForbiddenException('You can only cancel your own workouts or those you manage');
         }
         await this.repository.deleteScheduledWorkout(command.scheduledWorkoutId);
     }

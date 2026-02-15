@@ -17,8 +17,11 @@ export declare class SchedulingController {
         completed: boolean;
         reminderSent: boolean;
         notes: string | null;
+        clientName: string | undefined;
+        planName: string | undefined;
+        dayName: string | undefined;
     }>;
-    getUpcoming(query: GetScheduleQueryDto, userId: string): Promise<{
+    getUpcoming(query: GetScheduleQueryDto, user: any): Promise<{
         workouts: {
             id: string;
             trainerId: string;
@@ -27,6 +30,9 @@ export declare class SchedulingController {
             completed: boolean;
             reminderSent: boolean;
             notes: string | null;
+            clientName: string | undefined;
+            planName: string | undefined;
+            dayName: string | undefined;
         }[];
         total: number;
     }>;

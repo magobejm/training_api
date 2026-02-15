@@ -20,6 +20,7 @@ class ScheduleWorkoutDto {
 }
 exports.ScheduleWorkoutDto = ScheduleWorkoutDto;
 __decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsUUID)(),
     __metadata("design:type", String)
 ], ScheduleWorkoutDto.prototype, "trainerId", void 0);

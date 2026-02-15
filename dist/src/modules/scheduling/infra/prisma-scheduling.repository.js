@@ -38,23 +38,72 @@ let PrismaSchedulingRepository = class PrismaSchedulingRepository {
     async findById(id) {
         const workout = await this.prisma.scheduledWorkout.findUnique({
             where: { id },
+            include: {
+                user: {
+                    select: {
+                        name: true,
+                        email: true,
+                    }
+                },
+                trainingDay: {
+                    select: {
+                        name: true,
+                        plan: {
+                            select: {
+                                name: true
+                            }
+                        }
+                    }
+                }
+            }
         });
         return workout ? this.mapToDomain(workout) : null;
     }
     async findUpcoming(userId, filters) {
+        const whereClause = {
+            OR: [
+                { userId },
+            ],
+        };
+        if (filters?.trainerId) {
+            whereClause.OR.push({ trainerId: filters.trainerId });
+        }
+        const dateFilter = {};
+        if (filters?.startDate) {
+            dateFilter.gte = filters.startDate;
+        }
+        if (filters?.endDate) {
+            dateFilter.lte = filters.endDate;
+        }
         const workouts = await this.prisma.scheduledWorkout.findMany({
             where: {
-                userId,
-                ...(filters?.startDate && {
-                    scheduledFor: { gte: filters.startDate },
-                }),
-                ...(filters?.endDate && {
-                    scheduledFor: { lte: filters.endDate },
+                ...whereClause,
+                ...(Object.keys(dateFilter).length > 0 && {
+                    scheduledFor: dateFilter,
                 }),
             },
             orderBy: {
                 scheduledFor: 'asc',
             },
+            include: {
+                user: {
+                    select: {
+                        name: true,
+                        email: true,
+                        avatarUrl: true,
+                    }
+                },
+                trainingDay: {
+                    select: {
+                        name: true,
+                        plan: {
+                            select: {
+                                name: true
+                            }
+                        }
+                    }
+                }
+            }
         });
         return workouts.map((w) => this.mapToDomain(w));
     }
@@ -76,8 +125,18 @@ let PrismaSchedulingRepository = class PrismaSchedulingRepository {
             where: { id },
         });
     }
+    async hasOverlap(userId, scheduledFor, excludeId) {
+        const existing = await this.prisma.scheduledWorkout.findFirst({
+            where: {
+                userId,
+                scheduledFor,
+                ...(excludeId && { id: { not: excludeId } }),
+            },
+        });
+        return !!existing;
+    }
     mapToDomain(raw) {
-        return new scheduled_workout_entity_1.ScheduledWorkout(raw.id, raw.userId, raw.trainerId, raw.trainingDayId, raw.scheduledFor, raw.reminderSent, raw.completed, raw.notes, raw.createdAt, raw.updatedAt);
+        return new scheduled_workout_entity_1.ScheduledWorkout(raw.id, raw.userId, raw.trainerId, raw.trainingDayId, raw.scheduledFor, raw.reminderSent, raw.completed, raw.notes, raw.createdAt, raw.updatedAt, raw.user?.name || raw.user?.email || undefined, raw.trainingDay?.plan?.name || undefined, raw.trainingDay?.name || undefined);
     }
 };
 exports.PrismaSchedulingRepository = PrismaSchedulingRepository;

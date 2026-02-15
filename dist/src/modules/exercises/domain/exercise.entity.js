@@ -15,7 +15,8 @@ class Exercise {
     updatedBy;
     deletedAt;
     deletedBy;
-    constructor(id, name, description, muscleGroup, defaultVideoUrl, defaultImageUrl, thumbnailUrl, createdAt, updatedAt, createdBy, updatedBy, deletedAt, deletedBy) {
+    muscleGroupDetails;
+    constructor(id, name, description, muscleGroup, defaultVideoUrl, defaultImageUrl, thumbnailUrl, createdAt, updatedAt, createdBy, updatedBy, deletedAt, deletedBy, muscleGroupDetails) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -29,9 +30,10 @@ class Exercise {
         this.updatedBy = updatedBy;
         this.deletedAt = deletedAt;
         this.deletedBy = deletedBy;
+        this.muscleGroupDetails = muscleGroupDetails;
     }
     static create(name, description, muscleGroup, defaultVideoUrl, defaultImageUrl, thumbnailUrl, userId) {
-        return new Exercise(crypto.randomUUID(), name, description, muscleGroup, defaultVideoUrl, defaultImageUrl, thumbnailUrl, new Date(), new Date(), userId, null, null, null);
+        return new Exercise(crypto.randomUUID(), name, description, muscleGroup, defaultVideoUrl, defaultImageUrl, thumbnailUrl, new Date(), new Date(), userId, null, null, null, undefined);
     }
 }
 exports.Exercise = Exercise;

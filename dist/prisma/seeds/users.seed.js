@@ -38,36 +38,51 @@ const bcrypt = __importStar(require("bcrypt"));
 const prisma = new client_1.PrismaClient();
 async function seedUsers() {
     console.log('🌱 Seeding users...');
+    const trainerRole = await prisma.role.findUnique({ where: { name: 'TRAINER' } });
+    const clientRole = await prisma.role.findUnique({ where: { name: 'CLIENT' } });
+    const adminRole = await prisma.role.findUnique({ where: { name: 'ADMIN' } });
+    if (!trainerRole || !clientRole || !adminRole) {
+        throw new Error('Roles not found. Run seed:masters first.');
+    }
     const hashedPassword = await bcrypt.hash('trainer123', 10);
     const trainer = await prisma.user.upsert({
         where: { email: 'trainer@example.com' },
-        update: {},
+        update: {
+            roleId: trainerRole.id,
+        },
         create: {
             email: 'trainer@example.com',
             password: hashedPassword,
             role: 'TRAINER',
+            roleId: trainerRole.id,
         },
     });
     console.log('✅ Created trainer:', trainer.email);
     const clientPassword = await bcrypt.hash('client123', 10);
     const client = await prisma.user.upsert({
         where: { email: 'client@example.com' },
-        update: {},
+        update: {
+            roleId: clientRole.id,
+        },
         create: {
             email: 'client@example.com',
             password: clientPassword,
             role: 'CLIENT',
+            roleId: clientRole.id,
         },
     });
     console.log('✅ Created client:', client.email);
     const adminPassword = await bcrypt.hash('admin123', 10);
     const admin = await prisma.user.upsert({
         where: { email: 'admin@example.com' },
-        update: {},
+        update: {
+            roleId: adminRole.id,
+        },
         create: {
             email: 'admin@example.com',
             password: adminPassword,
             role: 'ADMIN',
+            roleId: adminRole.id,
         },
     });
     console.log('✅ Created admin:', admin.email);

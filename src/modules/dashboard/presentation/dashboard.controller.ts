@@ -11,12 +11,16 @@ export class DashboardController {
 
     @Get('stats')
     async getStats(@CurrentUser() user: AuthenticatedUser) {
+        const userRole = await this.prisma.role.findUnique({
+            where: { name: user.role }
+        });
+
         if (user.role === 'TRAINER') {
             const data = await this.dashboardService.getTrainerStats(user.userId);
-            return { role: 'TRAINER', data };
+            return { role: userRole, data };
         } else {
             const data = await this.dashboardService.getClientStats(user.userId);
-            return { role: 'CLIENT', data };
+            return { role: userRole, data };
         }
     }
 }

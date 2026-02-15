@@ -25,8 +25,12 @@ let RescheduleWorkoutUseCase = class RescheduleWorkoutUseCase {
         if (!workout) {
             throw new common_1.NotFoundException('Scheduled workout not found');
         }
-        if (workout.userId !== command.userId) {
-            throw new common_1.ForbiddenException('You can only reschedule your own workouts');
+        if (workout.userId !== command.userId && workout.trainerId !== command.userId) {
+            throw new common_1.ForbiddenException('You can only reschedule your own workouts or those you manage');
+        }
+        const hasOverlap = await this.repository.hasOverlap(workout.userId, command.newDate, workout.id);
+        if (hasOverlap) {
+            throw new common_1.ForbiddenException('The client already has a session scheduled at this time');
         }
         const rescheduled = workout.reschedule(command.newDate);
         return this.repository.updateScheduledWorkout(rescheduled);

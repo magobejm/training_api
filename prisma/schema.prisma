@@ -7,10 +7,46 @@ generator client {
   provider = "prisma-client-js"
 }
 
-enum Role {
+enum RoleEnum {
   ADMIN
   TRAINER
   CLIENT
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+model Role {
+  id          String   @id @default(uuid())
+  name        String   @unique // ADMIN, TRAINER, CLIENT
+  description String?
+  
+  // Relations
+  users       User[]
+  
+  // Audit
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt      @map("updated_at")
+
+  @@map("roles")
+}
+
+model MuscleGroup {
+  id          String     @id @default(uuid())
+  name        String     @unique // PECTORAL, DORSAL, etc.
+  imageUrl    String?    @map("image_url")
+  
+  // Relations
+  exercises   Exercise[]
+  
+  // Audit
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt      @map("updated_at")
+
+  @@map("muscle_groups")
 }
 
 model Organization {
@@ -36,12 +72,25 @@ model User {
   id       String  @id @default(uuid())
   email    String  @unique
   password String? @map("password_hash")
-  role     Role
+  role     RoleEnum
+  
+  // New Relation (Temporary optional)
+  roleId   String? @map("role_id")
+  userRole Role?   @relation(fields: [roleId], references: [id])
 
   organizationId String?       @map("organization_id")
   organization   Organization? @relation(fields: [organizationId], references: [id])
   name           String? // User's real name (e.g. John Doe)
   avatarUrl      String?       @map("avatar_url") // Custom profile picture url
+  
+  // Physical Profile
+  birthDate        DateTime? @map("birth_date")
+  gender           Gender?
+  height           Float?    // cm
+  weight           Float?    // kg
+  maxHeartRate     Int?      @map("max_heart_rate")
+  restingHeartRate Int?      @map("resting_heart_rate")
+  leanMass         Float?    @map("lean_mass") // %
 
   // Relations
   trainingPlans            TrainingPlan[]     @relation("CreatedPlans")
@@ -84,6 +133,10 @@ model Exercise {
   defaultImageUrl String? @map("default_image_url") // Cloudinary URL
   thumbnailUrl    String? @map("thumbnail_url") // Optional thumbnail
   muscleGroup     String  @map("muscle_group")
+  
+  // New Relation (Temporary optional)
+  muscleGroupId   String?      @map("muscle_group_id")
+  targetMuscleGroup MuscleGroup? @relation(fields: [muscleGroupId], references: [id])
 
   // Audit fields
   createdAt DateTime @default(now()) @map("created_at")

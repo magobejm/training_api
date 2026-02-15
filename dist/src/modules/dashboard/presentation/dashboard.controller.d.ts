@@ -4,10 +4,10 @@ export declare class DashboardController {
     private readonly dashboardService;
     constructor(dashboardService: DashboardService);
     getStats(user: AuthenticatedUser): Promise<{
-        role: string;
+        role: any;
         data: import("../dto/dashboard-stats.dto").TrainerStats;
     } | {
-        role: string;
+        role: any;
         data: import("../dto/dashboard-stats.dto").ClientStats;
     }>;
 }

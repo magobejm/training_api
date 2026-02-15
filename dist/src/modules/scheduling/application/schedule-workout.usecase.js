@@ -22,6 +22,10 @@ let ScheduleWorkoutUseCase = class ScheduleWorkoutUseCase {
         this.repository = repository;
     }
     async execute(command) {
+        const hasOverlap = await this.repository.hasOverlap(command.userId, command.scheduledFor);
+        if (hasOverlap) {
+            throw new common_1.ForbiddenException('The client already has a session scheduled at this time');
+        }
         const workout = scheduled_workout_entity_1.ScheduledWorkout.create(command.userId, command.trainerId, command.trainingDayId, command.scheduledFor, command.notes);
         return this.repository.scheduleWorkout(workout);
     }

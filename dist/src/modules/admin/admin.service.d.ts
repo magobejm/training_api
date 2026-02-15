@@ -6,10 +6,18 @@ export declare class AdminService {
         id: string;
         email: string;
         resetToken: string | null;
-        role: import("@prisma/client").$Enums.Role;
+        role: import("@prisma/client").$Enums.RoleEnum;
+        roleId: string | null;
         organizationId: string | null;
         name: string | null;
         avatarUrl: string | null;
+        birthDate: Date | null;
+        gender: import("@prisma/client").$Enums.Gender | null;
+        height: number | null;
+        weight: number | null;
+        maxHeartRate: number | null;
+        restingHeartRate: number | null;
+        leanMass: number | null;
         activePlanId: string | null;
         createdAt: Date;
         updatedAt: Date;
@@ -23,7 +31,7 @@ export declare class AdminService {
     getAllTrainers(): Promise<{
         id: string;
         email: string;
-        role: import("@prisma/client").$Enums.Role;
+        role: import("@prisma/client").$Enums.RoleEnum;
         createdAt: Date;
     }[]>;
     deleteTrainer(id: string): Promise<{
@@ -31,10 +39,18 @@ export declare class AdminService {
         email: string;
         resetToken: string | null;
         password: string | null;
-        role: import("@prisma/client").$Enums.Role;
+        role: import("@prisma/client").$Enums.RoleEnum;
+        roleId: string | null;
         organizationId: string | null;
         name: string | null;
         avatarUrl: string | null;
+        birthDate: Date | null;
+        gender: import("@prisma/client").$Enums.Gender | null;
+        height: number | null;
+        weight: number | null;
+        maxHeartRate: number | null;
+        restingHeartRate: number | null;
+        leanMass: number | null;
         activePlanId: string | null;
         createdAt: Date;
         updatedAt: Date;

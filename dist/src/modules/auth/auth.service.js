@@ -56,7 +56,10 @@ let AuthService = class AuthService {
         this.jwtService = jwtService;
     }
     async validateUser(email, pass) {
-        const user = await this.prisma.user.findUnique({ where: { email } });
+        const user = await this.prisma.user.findUnique({
+            where: { email },
+            include: { userRole: true }
+        });
         if (user && !user.deletedAt && user.password && (await bcrypt.compare(pass, user.password))) {
             return user;
         }
@@ -64,14 +67,14 @@ let AuthService = class AuthService {
     }
     async login(user) {
         const payload = { email: user.email, sub: user.id, role: user.role };
-        const { password, ...userWithoutPassword } = user;
+        const { password, userRole, ...userWithoutPassword } = user;
         return {
             accessToken: await this.jwtService.signAsync(payload),
             user: {
                 id: userWithoutPassword.id,
                 email: userWithoutPassword.email,
                 name: userWithoutPassword.name,
-                role: userWithoutPassword.role,
+                role: userRole,
                 avatarUrl: userWithoutPassword.avatarUrl,
             },
         };
@@ -92,28 +95,34 @@ let AuthService = class AuthService {
                     deletedBy: null,
                     updatedAt: new Date(),
                 },
+                include: { userRole: true }
             });
             return {
                 id: reactivatedUser.id,
                 email: reactivatedUser.email,
                 name: reactivatedUser.name,
-                role: reactivatedUser.role,
+                role: reactivatedUser.userRole,
             };
         }
         const hashedPassword = await bcrypt.hash(password, 10);
+        const userRole = await this.prisma.role.findUnique({
+            where: { name: role || client_1.RoleEnum.CLIENT }
+        });
         const user = await this.prisma.user.create({
             data: {
                 email,
                 password: hashedPassword,
                 name: name || email.split('@')[0],
-                role: role || client_1.Role.CLIENT,
+                role: role || client_1.RoleEnum.CLIENT,
+                roleId: userRole?.id,
             },
+            include: { userRole: true }
         });
         return {
             id: user.id,
             email: user.email,
             name: user.name,
-            role: user.role,
+            role: user.userRole,
         };
     }
     async changePassword(userId, oldPass, newPass) {

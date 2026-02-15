@@ -12,6 +12,15 @@ export declare class Exercise {
     readonly updatedBy: string | null;
     readonly deletedAt: Date | null;
     readonly deletedBy: string | null;
-    constructor(id: string, name: string, description: string, muscleGroup: string, defaultVideoUrl: string | null, defaultImageUrl: string | null, thumbnailUrl: string | null, createdAt: Date, updatedAt: Date, createdBy: string | null, updatedBy: string | null, deletedAt: Date | null, deletedBy: string | null);
+    readonly muscleGroupDetails?: {
+        id: string;
+        name: string;
+        imageUrl: string | null;
+    } | undefined;
+    constructor(id: string, name: string, description: string, muscleGroup: string, defaultVideoUrl: string | null, defaultImageUrl: string | null, thumbnailUrl: string | null, createdAt: Date, updatedAt: Date, createdBy: string | null, updatedBy: string | null, deletedAt: Date | null, deletedBy: string | null, muscleGroupDetails?: {
+        id: string;
+        name: string;
+        imageUrl: string | null;
+    } | undefined);
     static create(name: string, description: string, muscleGroup: string, defaultVideoUrl: string | null, defaultImageUrl: string | null, thumbnailUrl: string | null, userId: string): Exercise;
 }

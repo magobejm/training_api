@@ -15,8 +15,7 @@ class UpdateExerciseDto {
     name;
     description;
     muscleGroup;
-    videoUrl;
-    imageUrl;
+    defaultVideoUrl;
     defaultImageUrl;
     thumbnailUrl;
 }
@@ -43,15 +42,10 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsUrl)({}, { message: 'El URL del video debe ser válido' }),
     __metadata("design:type", String)
-], UpdateExerciseDto.prototype, "videoUrl", void 0);
+], UpdateExerciseDto.prototype, "defaultVideoUrl", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsUrl)({}, { message: 'El URL de la imagen debe ser válido' }),
-    __metadata("design:type", String)
-], UpdateExerciseDto.prototype, "imageUrl", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsUrl)({}, { message: 'El URL de la imagen por defecto debe ser válido' }),
     __metadata("design:type", String)
 ], UpdateExerciseDto.prototype, "defaultImageUrl", void 0);
 __decorate([
