@@ -111,7 +111,7 @@ export class UsersController {
             leanMass?: number;
         },
     ) {
-        return this.prisma.user.update({
+        const result = await this.prisma.user.update({
             where: { id: user.userId },
             data: {
                 avatarUrl: body.avatarUrl,
@@ -127,7 +127,13 @@ export class UsersController {
             select: {
                 id: true,
                 email: true,
-                role: true,
+                userRole: {
+                    select: {
+                        id: true,
+                        name: true,
+                        description: true,
+                    }
+                },
                 avatarUrl: true,
                 name: true,
                 birthDate: true,
@@ -139,6 +145,12 @@ export class UsersController {
                 leanMass: true,
             },
         });
+
+        return {
+            ...result,
+            role: result.userRole,
+            userRole: undefined,
+        };
     }
 
     @Patch(':id/plan')
@@ -178,6 +190,7 @@ export class UsersController {
         @Param('id') id: string,
         @Body() body: {
             name?: string;
+            avatarUrl?: string;
             birthDate?: string;
             gender?: Gender;
             height?: number;
@@ -187,10 +200,11 @@ export class UsersController {
             leanMass?: number;
         },
     ) {
-        return this.prisma.user.update({
+        const result = await this.prisma.user.update({
             where: { id },
             data: {
                 name: body.name,
+                avatarUrl: body.avatarUrl,
                 birthDate: body.birthDate ? new Date(body.birthDate) : undefined,
                 gender: body.gender,
                 height: body.height,
@@ -202,7 +216,13 @@ export class UsersController {
             select: {
                 id: true,
                 email: true,
-                role: true,
+                userRole: {
+                    select: {
+                        id: true,
+                        name: true,
+                        description: true,
+                    }
+                },
                 avatarUrl: true,
                 name: true,
                 birthDate: true,
@@ -214,6 +234,12 @@ export class UsersController {
                 leanMass: true,
             },
         });
+
+        return {
+            ...result,
+            role: result.userRole,
+            userRole: undefined,
+        };
     }
 
     @Delete(':id')

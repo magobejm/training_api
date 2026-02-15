@@ -59,9 +59,14 @@ export declare class UsersController {
         restingHeartRate?: number;
         leanMass?: number;
     }): Promise<{
+        role: {
+            id: string;
+            name: string;
+            description: string | null;
+        } | null;
+        userRole: undefined;
         id: string;
         email: string;
-        role: import("@prisma/client").$Enums.RoleEnum;
         name: string | null;
         avatarUrl: string | null;
         birthDate: Date | null;
@@ -83,6 +88,7 @@ export declare class UsersController {
     }>;
     update(id: string, body: {
         name?: string;
+        avatarUrl?: string;
         birthDate?: string;
         gender?: Gender;
         height?: number;
@@ -91,9 +97,14 @@ export declare class UsersController {
         restingHeartRate?: number;
         leanMass?: number;
     }): Promise<{
+        role: {
+            id: string;
+            name: string;
+            description: string | null;
+        } | null;
+        userRole: undefined;
         id: string;
         email: string;
-        role: import("@prisma/client").$Enums.RoleEnum;
         name: string | null;
         avatarUrl: string | null;
         birthDate: Date | null;

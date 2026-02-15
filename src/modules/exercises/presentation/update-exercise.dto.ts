@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsUrl, MaxLength, MinLength } from 'class-validator';
+import { IsOptional, IsString, IsUrl, MaxLength, MinLength, ValidateIf } from 'class-validator';
 
 export class UpdateExerciseDto {
     @IsOptional()
@@ -17,14 +17,17 @@ export class UpdateExerciseDto {
     muscleGroup?: string;
 
     @IsOptional()
+    @ValidateIf((o) => o.defaultVideoUrl !== '' && o.defaultVideoUrl !== null)
     @IsUrl({}, { message: 'El URL del video debe ser válido' })
-    defaultVideoUrl?: string;
+    defaultVideoUrl?: string | null;
 
     @IsOptional()
+    @ValidateIf((o) => o.defaultImageUrl !== '' && o.defaultImageUrl !== null)
     @IsUrl({}, { message: 'El URL de la imagen debe ser válido' })
-    defaultImageUrl?: string;
+    defaultImageUrl?: string | null;
 
     @IsOptional()
+    @ValidateIf((o) => o.thumbnailUrl !== '' && o.thumbnailUrl !== null)
     @IsUrl({}, { message: 'El URL de la miniatura debe ser válido' })
-    thumbnailUrl?: string;
+    thumbnailUrl?: string | null;
 }

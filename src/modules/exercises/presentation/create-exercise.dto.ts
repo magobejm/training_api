@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsUrl } from 'class-validator';
+import { IsString, IsOptional, IsUrl, ValidateIf } from 'class-validator';
 
 export class CreateExerciseDto {
   @IsString()
@@ -11,14 +11,17 @@ export class CreateExerciseDto {
   muscleGroup: string;
 
   @IsOptional()
+  @ValidateIf((o) => o.defaultVideoUrl !== '' && o.defaultVideoUrl !== null)
   @IsUrl()
-  defaultVideoUrl?: string;
+  defaultVideoUrl?: string | null;
 
   @IsOptional()
+  @ValidateIf((o) => o.defaultImageUrl !== '' && o.defaultImageUrl !== null)
   @IsUrl()
-  defaultImageUrl?: string;
+  defaultImageUrl?: string | null;
 
   @IsOptional()
+  @ValidateIf((o) => o.thumbnailUrl !== '' && o.thumbnailUrl !== null)
   @IsUrl()
-  thumbnailUrl?: string;
+  thumbnailUrl?: string | null;
 }

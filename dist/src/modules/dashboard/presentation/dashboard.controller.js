@@ -17,10 +17,13 @@ const common_1 = require("@nestjs/common");
 const jwt_auth_guard_1 = require("../../auth/guards/jwt-auth.guard");
 const current_user_decorator_1 = require("../../auth/decorators/current-user.decorator");
 const dashboard_service_1 = require("../application/dashboard.service");
+const prisma_service_1 = require("../../../prisma/prisma.service");
 let DashboardController = class DashboardController {
     dashboardService;
-    constructor(dashboardService) {
+    prisma;
+    constructor(dashboardService, prisma) {
         this.dashboardService = dashboardService;
+        this.prisma = prisma;
     }
     async getStats(user) {
         const userRole = await this.prisma.role.findUnique({
@@ -47,6 +50,7 @@ __decorate([
 exports.DashboardController = DashboardController = __decorate([
     (0, common_1.Controller)('dashboard'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    __metadata("design:paramtypes", [dashboard_service_1.DashboardService])
+    __metadata("design:paramtypes", [dashboard_service_1.DashboardService,
+        prisma_service_1.PrismaService])
 ], DashboardController);
 //# sourceMappingURL=dashboard.controller.js.map

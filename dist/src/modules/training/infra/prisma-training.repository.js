@@ -142,11 +142,23 @@ let PrismaTrainingRepository = class PrismaTrainingRepository {
         return this.mapPlanToDomain(raw);
     }
     async findAll(authorId) {
+        const whereClause = {
+            deletedAt: null,
+        };
+        if (authorId) {
+            whereClause.OR = [
+                { authorId },
+                {
+                    activeUsers: {
+                        some: {
+                            id: authorId,
+                        },
+                    },
+                },
+            ];
+        }
         const raw = await this.prisma.trainingPlan.findMany({
-            where: {
-                authorId,
-                deletedAt: null,
-            },
+            where: whereClause,
             include: {
                 days: {
                     orderBy: { order: 'asc' },

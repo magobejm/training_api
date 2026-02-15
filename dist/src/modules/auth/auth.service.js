@@ -80,7 +80,7 @@ let AuthService = class AuthService {
         };
     }
     async register(registerDto) {
-        const { email, password, name, role } = registerDto;
+        const { email, password, name, role, avatarUrl } = registerDto;
         const existingUser = await this.prisma.user.findUnique({
             where: { email },
         });
@@ -91,6 +91,7 @@ let AuthService = class AuthService {
                 data: {
                     password: hashedPassword,
                     name: name || existingUser.name,
+                    avatarUrl: avatarUrl || existingUser.avatarUrl,
                     deletedAt: null,
                     deletedBy: null,
                     updatedAt: new Date(),
@@ -114,6 +115,7 @@ let AuthService = class AuthService {
                 password: hashedPassword,
                 name: name || email.split('@')[0],
                 role: role || client_1.RoleEnum.CLIENT,
+                avatarUrl,
                 roleId: userRole?.id,
             },
             include: { userRole: true }

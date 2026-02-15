@@ -21,6 +21,7 @@ export declare class AuthService {
         password: string;
         name?: string;
         role: RoleEnum;
+        avatarUrl?: string;
     }): Promise<{
         id: string;
         email: string;

@@ -2,7 +2,7 @@ export declare class UpdateExerciseDto {
     name?: string;
     description?: string;
     muscleGroup?: string;
-    defaultVideoUrl?: string;
-    defaultImageUrl?: string;
-    thumbnailUrl?: string;
+    defaultVideoUrl?: string | null;
+    defaultImageUrl?: string | null;
+    thumbnailUrl?: string | null;
 }

@@ -40,17 +40,20 @@ __decorate([
 ], UpdateExerciseDto.prototype, "muscleGroup", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.ValidateIf)((o) => o.defaultVideoUrl !== '' && o.defaultVideoUrl !== null),
     (0, class_validator_1.IsUrl)({}, { message: 'El URL del video debe ser válido' }),
-    __metadata("design:type", String)
+    __metadata("design:type", Object)
 ], UpdateExerciseDto.prototype, "defaultVideoUrl", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.ValidateIf)((o) => o.defaultImageUrl !== '' && o.defaultImageUrl !== null),
     (0, class_validator_1.IsUrl)({}, { message: 'El URL de la imagen debe ser válido' }),
-    __metadata("design:type", String)
+    __metadata("design:type", Object)
 ], UpdateExerciseDto.prototype, "defaultImageUrl", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.ValidateIf)((o) => o.thumbnailUrl !== '' && o.thumbnailUrl !== null),
     (0, class_validator_1.IsUrl)({}, { message: 'El URL de la miniatura debe ser válido' }),
-    __metadata("design:type", String)
+    __metadata("design:type", Object)
 ], UpdateExerciseDto.prototype, "thumbnailUrl", void 0);
 //# sourceMappingURL=update-exercise.dto.js.map

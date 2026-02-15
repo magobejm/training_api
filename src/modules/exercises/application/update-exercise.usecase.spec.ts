@@ -47,7 +47,10 @@ describe('UpdateExerciseUseCase', () => {
             null,
             new Date(),
             new Date(),
-            'user-id', // Created by this user
+            'user-id',
+            null,
+            null,
+            null,
         );
 
         const updateData = {
@@ -96,7 +99,10 @@ describe('UpdateExerciseUseCase', () => {
             null,
             new Date(),
             new Date(),
-            'other-user-id', // Created by someone else
+            'other-user-id',
+            null,
+            null,
+            null,
         );
 
         mockExerciseRepository.findById.mockResolvedValue(existingExercise);
@@ -108,5 +114,46 @@ describe('UpdateExerciseUseCase', () => {
                 userId: 'current-user-id',
             }),
         ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('should allow clearing media fields by passing null', async () => {
+        const existingExercise = new Exercise(
+            'exercise-id',
+            'Push Up',
+            'Description',
+            'CHEST',
+            'http://video.com',
+            'http://image.com',
+            null,
+            new Date(),
+            new Date(),
+            'user-id',
+            null,
+            null,
+            null,
+        );
+
+        const updateData = {
+            defaultVideoUrl: null,
+            defaultImageUrl: null,
+        };
+
+        const updatedExercise = { ...existingExercise, ...updateData };
+
+        mockExerciseRepository.findById.mockResolvedValue(existingExercise);
+        mockExerciseRepository.update.mockResolvedValue(updatedExercise);
+
+        const result = await service.execute({
+            id: 'exercise-id',
+            data: updateData,
+            userId: 'user-id',
+        });
+
+        expect(result.defaultVideoUrl).toBeNull();
+        expect(result.defaultImageUrl).toBeNull();
+        expect(mockExerciseRepository.update).toHaveBeenCalledWith('exercise-id', {
+            ...updateData,
+            updatedBy: 'user-id',
+        });
     });
 });

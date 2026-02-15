@@ -151,11 +151,25 @@ export class PrismaTrainingRepository implements ITrainingRepository {
   }
 
   async findAll(authorId?: string): Promise<TrainingPlan[]> {
+    const whereClause: any = {
+      deletedAt: null,
+    };
+
+    if (authorId) {
+      whereClause.OR = [
+        { authorId },
+        {
+          activeUsers: {
+            some: {
+              id: authorId,
+            },
+          },
+        },
+      ];
+    }
+
     const raw = await this.prisma.trainingPlan.findMany({
-      where: {
-        authorId,
-        deletedAt: null,
-      },
+      where: whereClause,
       include: {
         days: {
           orderBy: { order: 'asc' },

@@ -34,17 +34,20 @@ __decorate([
 ], CreateExerciseDto.prototype, "muscleGroup", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.ValidateIf)((o) => o.defaultVideoUrl !== '' && o.defaultVideoUrl !== null),
     (0, class_validator_1.IsUrl)(),
-    __metadata("design:type", String)
+    __metadata("design:type", Object)
 ], CreateExerciseDto.prototype, "defaultVideoUrl", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.ValidateIf)((o) => o.defaultImageUrl !== '' && o.defaultImageUrl !== null),
     (0, class_validator_1.IsUrl)(),
-    __metadata("design:type", String)
+    __metadata("design:type", Object)
 ], CreateExerciseDto.prototype, "defaultImageUrl", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.ValidateIf)((o) => o.thumbnailUrl !== '' && o.thumbnailUrl !== null),
     (0, class_validator_1.IsUrl)(),
-    __metadata("design:type", String)
+    __metadata("design:type", Object)
 ], CreateExerciseDto.prototype, "thumbnailUrl", void 0);
 //# sourceMappingURL=create-exercise.dto.js.map

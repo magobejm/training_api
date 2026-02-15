@@ -3,11 +3,15 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../../auth/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../../auth/domain/jwt-payload.interface';
 import { DashboardService } from '../application/dashboard.service';
+import { PrismaService } from '../../../prisma/prisma.service';
 
 @Controller('dashboard')
 @UseGuards(JwtAuthGuard)
 export class DashboardController {
-    constructor(private readonly dashboardService: DashboardService) { }
+    constructor(
+        private readonly dashboardService: DashboardService,
+        private readonly prisma: PrismaService
+    ) { }
 
     @Get('stats')
     async getStats(@CurrentUser() user: AuthenticatedUser) {
