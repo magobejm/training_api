@@ -33,11 +33,37 @@ export class PrismaTrainingRepository implements ITrainingRepository {
         authorId: plan.authorId,
         createdAt: plan.createdAt,
         updatedAt: plan.updatedAt,
+        days: {
+          create: plan.days.map((day) => ({
+            id: day.id,
+            name: day.name,
+            order: day.order,
+            createdAt: day.createdAt,
+            updatedAt: day.updatedAt,
+            exercises: {
+              create: day.exercises.map((dayTx) => ({
+                id: dayTx.id,
+                exerciseId: dayTx.exercise.id,
+                order: dayTx.order,
+                targetSets: dayTx.targetSets,
+                targetReps: dayTx.targetReps,
+                targetRir: dayTx.targetRir,
+                restSeconds: dayTx.restSeconds,
+                customDescription: dayTx.customDescription,
+                customVideoUrl: dayTx.customVideoUrl,
+                customImageUrl: dayTx.customImageUrl,
+                coachNotes: dayTx.coachNotes,
+              })),
+            },
+          })),
+        },
       },
       include: {
         days: {
+          orderBy: { order: 'asc' },
           include: {
             exercises: {
+              orderBy: { order: 'asc' },
               include: { exercise: true },
             },
           },
@@ -208,5 +234,34 @@ export class PrismaTrainingRepository implements ITrainingRepository {
       raw.targetRir,
       raw.restSeconds,
     );
+  }
+
+  async deletePlan(id: string): Promise<void> {
+    await this.prisma.trainingPlan.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
+  }
+
+  async hasScheduledWorkouts(planId: string): Promise<boolean> {
+    const count = await this.prisma.scheduledWorkout.count({
+      where: {
+        trainingDay: {
+          planId,
+        },
+        completed: false, // Only check for active/future usage
+      },
+    });
+    return count > 0;
+  }
+
+  async hasActiveUsers(planId: string): Promise<boolean> {
+    const count = await this.prisma.user.count({
+      where: {
+        activePlanId: planId,
+        deletedAt: null,
+      },
+    });
+    return count > 0;
   }
 }

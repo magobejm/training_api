@@ -2,7 +2,7 @@ export declare class CreateExerciseDto {
     name: string;
     description: string;
     muscleGroup: string;
-    videoUrl?: string;
-    imageUrl?: string;
+    defaultVideoUrl?: string;
+    defaultImageUrl?: string;
     thumbnailUrl?: string;
 }

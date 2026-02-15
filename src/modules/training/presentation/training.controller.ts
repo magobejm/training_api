@@ -6,12 +6,14 @@ import {
   Param,
   NotFoundException,
   UseGuards,
+  Delete,
 } from '@nestjs/common';
 import { CreateTrainingPlanUseCase } from '../application/create-training-plan.usecase';
 import { GetTrainingPlanUseCase } from '../application/get-training-plan.usecase';
 import { GetTrainingPlansUseCase } from '../application/get-training-plans.usecase';
 import { AddExerciseToDayUseCase } from '../application/add-exercise-to-day.usecase';
 import { AddDayToPlanUseCase } from '../application/add-day-to-plan.usecase';
+import { DeleteTrainingPlanUseCase } from '../application/delete-training-plan.usecase';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../../auth/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../../auth/domain/jwt-payload.interface';
@@ -22,15 +24,50 @@ import {
   Min,
   IsUUID,
   IsUrl,
+  IsArray,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
-class CreatePlanDto {
+class CreateDayExerciseDto {
+  @IsUUID()
+  exerciseId: string;
+
+  @IsInt()
+  @Min(1)
+  order: number;
+
+  @IsInt()
+  @Min(1)
+  targetSets: number;
+
   @IsString()
-  name: string;
+  targetReps: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  targetRir?: number;
+
+  @IsInt()
+  @Min(0)
+  restSeconds: number;
 
   @IsOptional()
   @IsString()
-  description?: string;
+  customDescription?: string;
+
+  @IsOptional()
+  @IsUrl()
+  customVideoUrl?: string;
+
+  @IsOptional()
+  @IsUrl()
+  customImageUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  coachNotes?: string;
 }
 
 class CreateDayDto {
@@ -40,6 +77,27 @@ class CreateDayDto {
   @IsInt()
   @Min(1)
   order: number;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateDayExerciseDto)
+  exercises?: CreateDayExerciseDto[];
+}
+
+class CreatePlanDto {
+  @IsString()
+  name: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateDayDto)
+  days?: CreateDayDto[];
 }
 
 class AddExerciseDto {
@@ -92,6 +150,7 @@ export class TrainingController {
     private readonly getPlansUseCase: GetTrainingPlansUseCase,
     private readonly addDayUseCase: AddDayToPlanUseCase,
     private readonly addExerciseUseCase: AddExerciseToDayUseCase,
+    private readonly deletePlanUseCase: DeleteTrainingPlanUseCase,
   ) { }
 
   @Post()
@@ -112,6 +171,17 @@ export class TrainingController {
     const plan = await this.getPlanUseCase.execute(id);
     if (!plan) throw new NotFoundException('Plan not found');
     return plan;
+  }
+
+  @Delete(':id')
+  async deletePlan(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.deletePlanUseCase.execute({
+      id,
+      userId: user.userId,
+    });
   }
 
   @Post(':id/days')

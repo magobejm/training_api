@@ -17,6 +17,7 @@ const add_exercise_to_day_usecase_1 = require("./application/add-exercise-to-day
 const training_controller_1 = require("./presentation/training.controller");
 const add_day_to_plan_usecase_1 = require("./application/add-day-to-plan.usecase");
 const get_training_plans_usecase_1 = require("./application/get-training-plans.usecase");
+const delete_training_plan_usecase_1 = require("./application/delete-training-plan.usecase");
 let TrainingModule = class TrainingModule {
 };
 exports.TrainingModule = TrainingModule;
@@ -29,7 +30,9 @@ exports.TrainingModule = TrainingModule = __decorate([
             get_training_plan_usecase_1.GetTrainingPlanUseCase,
             get_training_plans_usecase_1.GetTrainingPlansUseCase,
             add_day_to_plan_usecase_1.AddDayToPlanUseCase,
+            add_day_to_plan_usecase_1.AddDayToPlanUseCase,
             add_exercise_to_day_usecase_1.AddExerciseToDayUseCase,
+            delete_training_plan_usecase_1.DeleteTrainingPlanUseCase,
             {
                 provide: training_repository_1.ITrainingRepository,
                 useClass: prisma_training_repository_1.PrismaTrainingRepository,

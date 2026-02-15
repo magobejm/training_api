@@ -10,6 +10,9 @@ exports.ExercisesModule = void 0;
 const common_1 = require("@nestjs/common");
 const create_exercise_usecase_1 = require("./application/create-exercise.usecase");
 const get_exercises_usecase_1 = require("./application/get-exercises.usecase");
+const get_exercise_by_id_usecase_1 = require("./application/get-exercise-by-id.usecase");
+const update_exercise_usecase_1 = require("./application/update-exercise.usecase");
+const delete_exercise_usecase_1 = require("./application/delete-exercise.usecase");
 const prisma_exercise_repository_1 = require("./infra/prisma-exercise.repository");
 const exercises_controller_1 = require("./presentation/exercises.controller");
 const exercise_repository_1 = require("./domain/exercise.repository");
@@ -22,6 +25,9 @@ exports.ExercisesModule = ExercisesModule = __decorate([
         providers: [
             create_exercise_usecase_1.CreateExerciseUseCase,
             get_exercises_usecase_1.GetExercisesUseCase,
+            get_exercise_by_id_usecase_1.GetExerciseByIdUseCase,
+            update_exercise_usecase_1.UpdateExerciseUseCase,
+            delete_exercise_usecase_1.DeleteExerciseUseCase,
             {
                 provide: exercise_repository_1.IExerciseRepository,
                 useClass: prisma_exercise_repository_1.PrismaExerciseRepository,

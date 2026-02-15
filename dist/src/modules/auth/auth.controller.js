@@ -20,6 +20,7 @@ const class_validator_1 = require("class-validator");
 class RegisterDto {
     email;
     password;
+    name;
     role;
 }
 __decorate([
@@ -31,6 +32,11 @@ __decorate([
     (0, class_validator_1.MinLength)(8),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "password", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], RegisterDto.prototype, "name", void 0);
 __decorate([
     (0, class_validator_1.IsEnum)(client_1.Role),
     __metadata("design:type", String)
@@ -96,7 +102,12 @@ let AuthController = class AuthController {
         return this.authService.login(validUser);
     }
     async register(body) {
-        return this.authService.register(body.email, body.password, body.role);
+        return this.authService.register({
+            email: body.email,
+            password: body.password,
+            name: body.name,
+            role: body.role,
+        });
     }
     async changePassword(req, body) {
         return this.authService.changePassword(req.user.userId, body.oldPassword, body.newPassword);

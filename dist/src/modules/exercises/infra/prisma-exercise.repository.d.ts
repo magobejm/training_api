@@ -9,5 +9,7 @@ export declare class PrismaExerciseRepository implements IExerciseRepository {
     findById(id: string): Promise<Exercise | null>;
     update(id: string, data: Partial<Exercise>): Promise<Exercise>;
     delete(id: string): Promise<void>;
+    findAllByIds(ids: string[]): Promise<Exercise[]>;
+    hasDayExercises(id: string): Promise<boolean>;
     private mapToDomain;
 }

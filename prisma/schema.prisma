@@ -40,9 +40,11 @@ model User {
 
   organizationId String?       @map("organization_id")
   organization   Organization? @relation(fields: [organizationId], references: [id])
+  name           String? // User's real name (e.g. John Doe)
+  avatarUrl      String?       @map("avatar_url") // Custom profile picture url
 
   // Relations
-  trainingPlans            TrainingPlan[]
+  trainingPlans            TrainingPlan[]     @relation("CreatedPlans")
   workoutSessions          WorkoutSession[]
   bodyMetrics              BodyMetric[]
   progressPhotos           ProgressPhoto[]
@@ -51,6 +53,9 @@ model User {
   messages                 Message[]
   userScheduledWorkouts    ScheduledWorkout[] @relation("UserScheduledWorkouts")
   trainerScheduledWorkouts ScheduledWorkout[] @relation("TrainerScheduledWorkouts")
+
+  activePlanId String?       @map("active_plan_id")
+  activePlan   TrainingPlan? @relation("ActivePlan", fields: [activePlanId], references: [id])
 
   // Audit fields
   createdAt DateTime @default(now()) @map("created_at")
@@ -63,8 +68,10 @@ model User {
   deletedBy String?   @map("deleted_by")
 
   // Password Reset
-  resetToken        String?   @unique @map("reset_token")
-  resetTokenExpires DateTime? @map("reset_token_expires")
+  resetToken        String?       @unique @map("reset_token")
+  resetTokenExpires DateTime?     @map("reset_token_expires")
+  trainingPlan      TrainingPlan? @relation(fields: [trainingPlanId], references: [id])
+  trainingPlanId    String?
 
   @@map("users")
 }
@@ -100,7 +107,7 @@ model TrainingPlan {
   description String?
 
   authorId String @map("author_id")
-  author   User   @relation(fields: [authorId], references: [id])
+  author   User   @relation("CreatedPlans", fields: [authorId], references: [id])
 
   // Audit fields
   createdAt DateTime @default(now()) @map("created_at")
@@ -113,7 +120,9 @@ model TrainingPlan {
   deletedBy String?   @map("deleted_by")
 
   // Relations
-  days TrainingDay[]
+  days        TrainingDay[]
+  activeUsers User[]        @relation("ActivePlan")
+  users       User[]
 
   @@index([authorId])
   @@map("training_plans")

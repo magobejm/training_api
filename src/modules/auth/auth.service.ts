@@ -28,12 +28,15 @@ export class AuthService {
       user: {
         id: userWithoutPassword.id,
         email: userWithoutPassword.email,
+        name: userWithoutPassword.name,
         role: userWithoutPassword.role,
+        avatarUrl: userWithoutPassword.avatarUrl,
       },
     };
   }
 
-  async register(email: string, password: string, role: Role = Role.CLIENT) {
+  async register(registerDto: { email: string; password: string; name?: string; role: Role }) {
+    const { email, password, name, role } = registerDto;
     // Check if user exists (including soft-deleted)
     const existingUser = await this.prisma.user.findUnique({
       where: { email },
@@ -47,6 +50,7 @@ export class AuthService {
         where: { email },
         data: {
           password: hashedPassword,
+          name: name || existingUser.name, // Keep existing name if not provided
           deletedAt: null,
           deletedBy: null,
           updatedAt: new Date(),
@@ -56,6 +60,7 @@ export class AuthService {
       return {
         id: reactivatedUser.id,
         email: reactivatedUser.email,
+        name: reactivatedUser.name,
         role: reactivatedUser.role,
       };
     }
@@ -66,13 +71,15 @@ export class AuthService {
       data: {
         email,
         password: hashedPassword,
-        role,
+        name: name || email.split('@')[0], // Default name
+        role: role || Role.CLIENT,
       },
     });
 
     return {
       id: user.id,
       email: user.email,
+      name: user.name,
       role: user.role,
     };
   }

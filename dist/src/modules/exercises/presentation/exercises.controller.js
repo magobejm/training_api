@@ -18,19 +18,45 @@ const create_exercise_usecase_1 = require("../application/create-exercise.usecas
 const get_exercises_usecase_1 = require("../application/get-exercises.usecase");
 const jwt_auth_guard_1 = require("../../auth/guards/jwt-auth.guard");
 const create_exercise_dto_1 = require("./create-exercise.dto");
+const update_exercise_dto_1 = require("./update-exercise.dto");
+const get_exercise_by_id_usecase_1 = require("../application/get-exercise-by-id.usecase");
+const update_exercise_usecase_1 = require("../application/update-exercise.usecase");
+const delete_exercise_usecase_1 = require("../application/delete-exercise.usecase");
 const current_user_decorator_1 = require("../../auth/decorators/current-user.decorator");
 let ExercisesController = class ExercisesController {
     createExerciseUseCase;
     getExercisesUseCase;
-    constructor(createExerciseUseCase, getExercisesUseCase) {
+    getExerciseByIdUseCase;
+    updateExerciseUseCase;
+    deleteExerciseUseCase;
+    constructor(createExerciseUseCase, getExercisesUseCase, getExerciseByIdUseCase, updateExerciseUseCase, deleteExerciseUseCase) {
         this.createExerciseUseCase = createExerciseUseCase;
         this.getExercisesUseCase = getExercisesUseCase;
+        this.getExerciseByIdUseCase = getExerciseByIdUseCase;
+        this.updateExerciseUseCase = updateExerciseUseCase;
+        this.deleteExerciseUseCase = deleteExerciseUseCase;
     }
     async create(dto, user) {
         return this.createExerciseUseCase.execute({ ...dto, userId: user.userId });
     }
     async findAll() {
         return this.getExercisesUseCase.execute();
+    }
+    async findOne(id) {
+        return this.getExerciseByIdUseCase.execute(id);
+    }
+    async update(id, dto, user) {
+        return this.updateExerciseUseCase.execute({
+            id,
+            data: dto,
+            userId: user.userId,
+        });
+    }
+    async remove(id, user) {
+        return this.deleteExerciseUseCase.execute({
+            id,
+            userId: user.userId,
+        });
     }
 };
 exports.ExercisesController = ExercisesController;
@@ -48,10 +74,37 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], ExercisesController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ExercisesController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, current_user_decorator_1.CurrentUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, update_exercise_dto_1.UpdateExerciseDto, Object]),
+    __metadata("design:returntype", Promise)
+], ExercisesController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, current_user_decorator_1.CurrentUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], ExercisesController.prototype, "remove", null);
 exports.ExercisesController = ExercisesController = __decorate([
     (0, common_1.Controller)('exercises'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [create_exercise_usecase_1.CreateExerciseUseCase,
-        get_exercises_usecase_1.GetExercisesUseCase])
+        get_exercises_usecase_1.GetExercisesUseCase,
+        get_exercise_by_id_usecase_1.GetExerciseByIdUseCase,
+        update_exercise_usecase_1.UpdateExerciseUseCase,
+        delete_exercise_usecase_1.DeleteExerciseUseCase])
 ], ExercisesController);
 //# sourceMappingURL=exercises.controller.js.map

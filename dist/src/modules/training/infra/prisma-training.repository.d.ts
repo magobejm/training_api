@@ -15,4 +15,7 @@ export declare class PrismaTrainingRepository implements ITrainingRepository {
     private mapPlanToDomain;
     private mapDayToDomain;
     private mapDayExerciseToDomain;
+    deletePlan(id: string): Promise<void>;
+    hasScheduledWorkouts(planId: string): Promise<boolean>;
+    hasActiveUsers(planId: string): Promise<boolean>;
 }

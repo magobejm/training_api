@@ -8,6 +8,7 @@ import { AddExerciseToDayUseCase } from './application/add-exercise-to-day.useca
 import { TrainingController } from './presentation/training.controller';
 import { AddDayToPlanUseCase } from './application/add-day-to-plan.usecase';
 import { GetTrainingPlansUseCase } from './application/get-training-plans.usecase';
+import { DeleteTrainingPlanUseCase } from './application/delete-training-plan.usecase';
 
 @Module({
   imports: [ExercisesModule],
@@ -17,11 +18,13 @@ import { GetTrainingPlansUseCase } from './application/get-training-plans.usecas
     GetTrainingPlanUseCase,
     GetTrainingPlansUseCase,
     AddDayToPlanUseCase,
+    AddDayToPlanUseCase,
     AddExerciseToDayUseCase,
+    DeleteTrainingPlanUseCase,
     {
       provide: ITrainingRepository,
       useClass: PrismaTrainingRepository,
     },
   ],
 })
-export class TrainingModule {}
+export class TrainingModule { }

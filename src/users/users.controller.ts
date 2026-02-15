@@ -1,6 +1,7 @@
-import { Controller, Get, Delete, Param, UseGuards, Request, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Delete, Patch, Body, Param, UseGuards, Request, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtAuthGuard } from '../modules/auth/guards/jwt-auth.guard';
+import { CurrentUser } from '../modules/auth/decorators/current-user.decorator';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
@@ -19,6 +20,12 @@ export class UsersController {
                 role: true,
                 createdAt: true,
                 updatedAt: true,
+                activePlan: {
+                    select: {
+                        id: true,
+                        name: true,
+                    },
+                },
             },
         });
         return users;
@@ -36,6 +43,13 @@ export class UsersController {
                 createdAt: true,
                 updatedAt: true,
                 deletedAt: true,
+                activePlan: {
+                    select: {
+                        id: true,
+                        name: true,
+                        description: true,
+                    }
+                }
             },
         });
 
@@ -44,6 +58,57 @@ export class UsersController {
         }
 
         return user;
+    }
+
+    @Patch('profile')
+    async updateProfile(
+        @CurrentUser() user: any,
+        @Body() body: { avatarUrl?: string },
+    ) {
+        return this.prisma.user.update({
+            where: { id: user.userId },
+            data: {
+                avatarUrl: body.avatarUrl,
+            },
+            select: {
+                id: true,
+                email: true,
+                role: true,
+                avatarUrl: true,
+            },
+        });
+    }
+
+    @Patch(':id/plan')
+    async assignPlan(
+        @Param('id') id: string,
+        @Body() body: { planId: string | null },
+    ) {
+        const { planId } = body;
+
+        // Verify user exists
+        const user = await this.prisma.user.findUnique({ where: { id } });
+        if (!user) throw new NotFoundException('User not found');
+
+        // Verify plan exists if not unassigning
+        if (planId) {
+            const plan = await this.prisma.trainingPlan.findUnique({ where: { id: planId } });
+            if (!plan) throw new NotFoundException('Training plan not found');
+        }
+
+        return this.prisma.user.update({
+            where: { id },
+            data: { activePlanId: planId },
+            select: {
+                id: true,
+                activePlan: {
+                    select: {
+                        id: true,
+                        name: true,
+                    }
+                }
+            }
+        });
     }
 
     @Delete(':id')

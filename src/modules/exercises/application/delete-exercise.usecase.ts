@@ -25,18 +25,25 @@ export class DeleteExerciseUseCase {
         // Check if exercise exists
         const exercise = await this.exerciseRepository.findById(id);
         if (!exercise) {
-            throw new NotFoundException(`Exercise with ID ${id} not found`);
+            throw new NotFoundException(`Ejercicio con ID ${id} no encontrado`);
         }
 
         // Check permissions: only creator can delete (unless admin - add role check later)
-        if (exercise.createdBy !== userId) {
+        if (exercise.createdBy && exercise.createdBy !== userId) {
+            // For now, if createdBy is null (system) or matches user.
+            // If createdBy is set but different, block.
             throw new ForbiddenException(
-                'You do not have permission to delete this exercise',
+                'No tienes permiso para eliminar este ejercicio',
             );
         }
 
-        // TODO: Check if exercise is used in any training plans
-        // For now, we'll allow deletion - can add this validation later
+        // Check if exercise is used in any training plans
+        const isUsed = await this.exerciseRepository.hasDayExercises(id);
+        if (isUsed) {
+            throw new BadRequestException(
+                'No se puede eliminar el ejercicio porque está siendo usado en uno o más planes de entrenamiento.',
+            );
+        }
 
         await this.exerciseRepository.delete(id);
     }

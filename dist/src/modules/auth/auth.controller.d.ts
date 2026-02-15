@@ -3,6 +3,7 @@ import { Role } from '@prisma/client';
 declare class RegisterDto {
     email: string;
     password: string;
+    name?: string;
     role: Role;
 }
 declare class LoginDto {
@@ -28,12 +29,15 @@ export declare class AuthController {
         user: {
             id: string;
             email: string;
+            name: string | null;
             role: import("@prisma/client").$Enums.Role;
+            avatarUrl: string | null;
         };
     }>;
     register(body: RegisterDto): Promise<{
         id: string;
         email: string;
+        name: string | null;
         role: import("@prisma/client").$Enums.Role;
     }>;
     changePassword(req: any, body: ChangePasswordDto): Promise<{

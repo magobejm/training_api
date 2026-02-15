@@ -15,8 +15,8 @@ class CreateExerciseDto {
     name;
     description;
     muscleGroup;
-    videoUrl;
-    imageUrl;
+    defaultVideoUrl;
+    defaultImageUrl;
     thumbnailUrl;
 }
 exports.CreateExerciseDto = CreateExerciseDto;
@@ -36,12 +36,12 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsUrl)(),
     __metadata("design:type", String)
-], CreateExerciseDto.prototype, "videoUrl", void 0);
+], CreateExerciseDto.prototype, "defaultVideoUrl", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsUrl)(),
     __metadata("design:type", String)
-], CreateExerciseDto.prototype, "imageUrl", void 0);
+], CreateExerciseDto.prototype, "defaultImageUrl", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsUrl)(),

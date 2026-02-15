@@ -69,6 +69,26 @@ export class PrismaExerciseRepository implements IExerciseRepository {
     });
   }
 
+  async findAllByIds(ids: string[]): Promise<Exercise[]> {
+    const raw = await this.prisma.exercise.findMany({
+      where: {
+        id: { in: ids },
+        deletedAt: null,
+      },
+    });
+    return raw.map((item) => this.mapToDomain(item));
+  }
+
+  async hasDayExercises(id: string): Promise<boolean> {
+    const count = await this.prisma.dayExercise.count({
+      where: {
+        exerciseId: id,
+        deletedAt: null,
+      },
+    });
+    return count > 0;
+  }
+
   private mapToDomain(raw: PrismaExercise): Exercise {
     return new Exercise(
       raw.id,

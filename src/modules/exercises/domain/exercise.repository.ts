@@ -6,6 +6,8 @@ export interface IExerciseRepository {
   findById(id: string): Promise<Exercise | null>;
   update(id: string, data: Partial<Exercise>): Promise<Exercise>;
   delete(id: string): Promise<void>;
+  findAllByIds(ids: string[]): Promise<Exercise[]>;
+  hasDayExercises(id: string): Promise<boolean>;
 }
 
 export const IExerciseRepository = Symbol('IExerciseRepository');

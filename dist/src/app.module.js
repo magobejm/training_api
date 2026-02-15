@@ -19,6 +19,8 @@ const scheduling_module_1 = require("./modules/scheduling/scheduling.module");
 const prisma_module_1 = require("./prisma/prisma.module");
 const users_module_1 = require("./users/users.module");
 const admin_module_1 = require("./modules/admin/admin.module");
+const health_module_1 = require("./modules/health/health.module");
+const dashboard_module_1 = require("./modules/dashboard/dashboard.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -36,6 +38,8 @@ exports.AppModule = AppModule = __decorate([
             scheduling_module_1.SchedulingModule,
             users_module_1.UsersModule,
             admin_module_1.AdminModule,
+            health_module_1.HealthModule,
+            dashboard_module_1.DashboardModule,
         ],
     })
 ], AppModule);

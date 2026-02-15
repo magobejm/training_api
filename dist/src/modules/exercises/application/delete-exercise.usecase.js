@@ -24,10 +24,14 @@ let DeleteExerciseUseCase = class DeleteExerciseUseCase {
         const { id, userId } = input;
         const exercise = await this.exerciseRepository.findById(id);
         if (!exercise) {
-            throw new common_1.NotFoundException(`Exercise with ID ${id} not found`);
+            throw new common_1.NotFoundException(`Ejercicio con ID ${id} no encontrado`);
         }
-        if (exercise.createdBy !== userId) {
-            throw new common_1.ForbiddenException('You do not have permission to delete this exercise');
+        if (exercise.createdBy && exercise.createdBy !== userId) {
+            throw new common_1.ForbiddenException('No tienes permiso para eliminar este ejercicio');
+        }
+        const isUsed = await this.exerciseRepository.hasDayExercises(id);
+        if (isUsed) {
+            throw new common_1.BadRequestException('No se puede eliminar el ejercicio porque está siendo usado en uno o más planes de entrenamiento.');
         }
         await this.exerciseRepository.delete(id);
     }

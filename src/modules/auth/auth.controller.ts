@@ -1,7 +1,7 @@
 import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Role } from '@prisma/client';
-import { IsEmail, IsString, MinLength, IsEnum } from 'class-validator';
+import { IsEmail, IsString, MinLength, IsEnum, IsOptional } from 'class-validator';
 
 class RegisterDto {
   @IsEmail()
@@ -10,6 +10,10 @@ class RegisterDto {
   @IsString()
   @MinLength(8)
   password: string;
+
+  @IsString()
+  @IsOptional()
+  name?: string;
 
   @IsEnum(Role)
   role: Role;
@@ -70,7 +74,12 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() body: RegisterDto) {
-    return this.authService.register(body.email, body.password, body.role);
+    return this.authService.register({
+      email: body.email,
+      password: body.password,
+      name: body.name,
+      role: body.role,
+    });
   }
 
   @UseGuards(JwtAuthGuard)

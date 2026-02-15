@@ -12,11 +12,11 @@ export class CreateExerciseDto {
 
   @IsOptional()
   @IsUrl()
-  videoUrl?: string;
+  defaultVideoUrl?: string;
 
   @IsOptional()
   @IsUrl()
-  imageUrl?: string;
+  defaultImageUrl?: string;
 
   @IsOptional()
   @IsUrl()

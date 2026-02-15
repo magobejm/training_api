@@ -16,6 +16,7 @@ exports.UsersController = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
 const jwt_auth_guard_1 = require("../modules/auth/guards/jwt-auth.guard");
+const current_user_decorator_1 = require("../modules/auth/decorators/current-user.decorator");
 let UsersController = class UsersController {
     prisma;
     constructor(prisma) {
@@ -32,6 +33,12 @@ let UsersController = class UsersController {
                 role: true,
                 createdAt: true,
                 updatedAt: true,
+                activePlan: {
+                    select: {
+                        id: true,
+                        name: true,
+                    },
+                },
             },
         });
         return users;
@@ -46,12 +53,57 @@ let UsersController = class UsersController {
                 createdAt: true,
                 updatedAt: true,
                 deletedAt: true,
+                activePlan: {
+                    select: {
+                        id: true,
+                        name: true,
+                        description: true,
+                    }
+                }
             },
         });
         if (!user || user.deletedAt) {
             throw new common_1.NotFoundException('User not found');
         }
         return user;
+    }
+    async updateProfile(user, body) {
+        return this.prisma.user.update({
+            where: { id: user.userId },
+            data: {
+                avatarUrl: body.avatarUrl,
+            },
+            select: {
+                id: true,
+                email: true,
+                role: true,
+                avatarUrl: true,
+            },
+        });
+    }
+    async assignPlan(id, body) {
+        const { planId } = body;
+        const user = await this.prisma.user.findUnique({ where: { id } });
+        if (!user)
+            throw new common_1.NotFoundException('User not found');
+        if (planId) {
+            const plan = await this.prisma.trainingPlan.findUnique({ where: { id: planId } });
+            if (!plan)
+                throw new common_1.NotFoundException('Training plan not found');
+        }
+        return this.prisma.user.update({
+            where: { id },
+            data: { activePlanId: planId },
+            select: {
+                id: true,
+                activePlan: {
+                    select: {
+                        id: true,
+                        name: true,
+                    }
+                }
+            }
+        });
     }
     async softDelete(id, req) {
         const userId = req.user.userId;
@@ -79,6 +131,22 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Patch)('profile'),
+    __param(0, (0, current_user_decorator_1.CurrentUser)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "updateProfile", null);
+__decorate([
+    (0, common_1.Patch)(':id/plan'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "assignPlan", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),

@@ -30,11 +30,37 @@ let PrismaTrainingRepository = class PrismaTrainingRepository {
                 authorId: plan.authorId,
                 createdAt: plan.createdAt,
                 updatedAt: plan.updatedAt,
+                days: {
+                    create: plan.days.map((day) => ({
+                        id: day.id,
+                        name: day.name,
+                        order: day.order,
+                        createdAt: day.createdAt,
+                        updatedAt: day.updatedAt,
+                        exercises: {
+                            create: day.exercises.map((dayTx) => ({
+                                id: dayTx.id,
+                                exerciseId: dayTx.exercise.id,
+                                order: dayTx.order,
+                                targetSets: dayTx.targetSets,
+                                targetReps: dayTx.targetReps,
+                                targetRir: dayTx.targetRir,
+                                restSeconds: dayTx.restSeconds,
+                                customDescription: dayTx.customDescription,
+                                customVideoUrl: dayTx.customVideoUrl,
+                                customImageUrl: dayTx.customImageUrl,
+                                coachNotes: dayTx.coachNotes,
+                            })),
+                        },
+                    })),
+                },
             },
             include: {
                 days: {
+                    orderBy: { order: 'asc' },
                     include: {
                         exercises: {
+                            orderBy: { order: 'asc' },
                             include: { exercise: true },
                         },
                     },
@@ -145,6 +171,32 @@ let PrismaTrainingRepository = class PrismaTrainingRepository {
     mapDayExerciseToDomain(raw) {
         const baseExercise = new exercise_entity_1.Exercise(raw.exercise.id, raw.exercise.name, raw.exercise.description, raw.exercise.muscleGroup, raw.exercise.defaultVideoUrl, raw.exercise.defaultImageUrl, raw.exercise.thumbnailUrl, raw.exercise.createdAt, raw.exercise.updatedAt, raw.exercise.createdBy, raw.exercise.updatedBy, raw.exercise.deletedAt, raw.exercise.deletedBy);
         return new day_exercise_entity_1.DayExercise(raw.id, raw.dayId, baseExercise, raw.order, raw.customDescription, raw.customVideoUrl, raw.customImageUrl, raw.coachNotes, raw.targetSets, raw.targetReps, raw.targetRir, raw.restSeconds);
+    }
+    async deletePlan(id) {
+        await this.prisma.trainingPlan.update({
+            where: { id },
+            data: { deletedAt: new Date() },
+        });
+    }
+    async hasScheduledWorkouts(planId) {
+        const count = await this.prisma.scheduledWorkout.count({
+            where: {
+                trainingDay: {
+                    planId,
+                },
+                completed: false,
+            },
+        });
+        return count > 0;
+    }
+    async hasActiveUsers(planId) {
+        const count = await this.prisma.user.count({
+            where: {
+                activePlanId: planId,
+                deletedAt: null,
+            },
+        });
+        return count > 0;
     }
 };
 exports.PrismaTrainingRepository = PrismaTrainingRepository;

@@ -74,6 +74,24 @@ let PrismaExerciseRepository = class PrismaExerciseRepository {
             },
         });
     }
+    async findAllByIds(ids) {
+        const raw = await this.prisma.exercise.findMany({
+            where: {
+                id: { in: ids },
+                deletedAt: null,
+            },
+        });
+        return raw.map((item) => this.mapToDomain(item));
+    }
+    async hasDayExercises(id) {
+        const count = await this.prisma.dayExercise.count({
+            where: {
+                exerciseId: id,
+                deletedAt: null,
+            },
+        });
+        return count > 0;
+    }
     mapToDomain(raw) {
         return new exercise_entity_1.Exercise(raw.id, raw.name, raw.description, raw.muscleGroup, raw.defaultVideoUrl, raw.defaultImageUrl, raw.thumbnailUrl, raw.createdAt, raw.updatedAt, raw.createdBy, raw.updatedBy, raw.deletedAt, raw.deletedBy);
     }

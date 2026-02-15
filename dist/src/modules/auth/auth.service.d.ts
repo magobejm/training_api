@@ -11,12 +11,20 @@ export declare class AuthService {
         user: {
             id: string;
             email: string;
+            name: string | null;
             role: import("@prisma/client").$Enums.Role;
+            avatarUrl: string | null;
         };
     }>;
-    register(email: string, password: string, role?: Role): Promise<{
+    register(registerDto: {
+        email: string;
+        password: string;
+        name?: string;
+        role: Role;
+    }): Promise<{
         id: string;
         email: string;
+        name: string | null;
         role: import("@prisma/client").$Enums.Role;
     }>;
     changePassword(userId: string, oldPass: string, newPass: string): Promise<{

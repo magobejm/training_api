@@ -10,6 +10,8 @@ import { SchedulingModule } from './modules/scheduling/scheduling.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { HealthModule } from './modules/health/health.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { AdminModule } from './modules/admin/admin.module';
     SchedulingModule,
     UsersModule,
     AdminModule,
+    HealthModule,
+    DashboardModule,
   ],
 })
 export class AppModule { }
