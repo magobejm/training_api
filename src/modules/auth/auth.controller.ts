@@ -1,22 +1,26 @@
-import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, Request, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { Role } from '@prisma/client';
-import { IsEmail, IsString, MinLength, IsEnum, IsOptional } from 'class-validator';
+import { RoleEnum } from '@prisma/client';
+import { Roles } from './decorators/roles.decorator';
+import { RolesGuard } from './guards/roles.guard';
+import { Public } from './decorators/public.decorator';
+import { IsEnum, IsString, IsOptional, MinLength, IsEmail } from 'class-validator';
 
 class RegisterDto {
   @IsEmail()
   email: string;
 
   @IsString()
-  @MinLength(8)
+  @MinLength(6)
   password: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   name?: string;
 
-  @IsEnum(Role)
-  role: Role;
+  @IsOptional()
+  @IsEnum(RoleEnum)
+  role: RoleEnum;
 }
 
 class LoginDto {
@@ -51,9 +55,7 @@ class ResetPasswordDto {
   newPassword: string;
 }
 
-import { UseGuards, Request, Get } from '@nestjs/common';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) { }

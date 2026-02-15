@@ -2,6 +2,7 @@ import { Controller, Get, Delete, Patch, Body, Param, UseGuards, Request, NotFou
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtAuthGuard } from '../modules/auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../modules/auth/decorators/current-user.decorator';
+import { Gender } from '@prisma/client';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
@@ -17,9 +18,18 @@ export class UsersController {
             select: {
                 id: true,
                 email: true,
-                role: true,
+                // role: true, // Deprecated Enum
+                userRole: { // New Relation
+                    select: {
+                        id: true,
+                        name: true,
+                        description: true,
+                    }
+                },
                 createdAt: true,
                 updatedAt: true,
+                name: true,
+                avatarUrl: true,
                 activePlan: {
                     select: {
                         id: true,
@@ -28,7 +38,13 @@ export class UsersController {
                 },
             },
         });
-        return users;
+
+        // Map userRole to role
+        return users.map(user => ({
+            ...user,
+            role: user.userRole,
+            userRole: undefined,
+        }));
     }
 
 
@@ -39,10 +55,26 @@ export class UsersController {
             select: {
                 id: true,
                 email: true,
-                role: true,
+                // role: true,
+                userRole: {
+                    select: {
+                        id: true,
+                        name: true,
+                        description: true,
+                    }
+                },
                 createdAt: true,
                 updatedAt: true,
                 deletedAt: true,
+                name: true,
+                avatarUrl: true,
+                birthDate: true,
+                gender: true,
+                height: true,
+                weight: true,
+                maxHeartRate: true,
+                restingHeartRate: true,
+                leanMass: true,
                 activePlan: {
                     select: {
                         id: true,
@@ -57,24 +89,54 @@ export class UsersController {
             throw new NotFoundException('User not found');
         }
 
-        return user;
+        return {
+            ...user,
+            role: user.userRole,
+            userRole: undefined,
+        };
     }
 
     @Patch('profile')
     async updateProfile(
         @CurrentUser() user: any,
-        @Body() body: { avatarUrl?: string },
+        @Body() body: {
+            avatarUrl?: string;
+            name?: string;
+            birthDate?: string;
+            gender?: Gender;
+            height?: number;
+            weight?: number;
+            maxHeartRate?: number;
+            restingHeartRate?: number;
+            leanMass?: number;
+        },
     ) {
         return this.prisma.user.update({
             where: { id: user.userId },
             data: {
                 avatarUrl: body.avatarUrl,
+                name: body.name,
+                birthDate: body.birthDate ? new Date(body.birthDate) : undefined,
+                gender: body.gender,
+                height: body.height,
+                weight: body.weight,
+                maxHeartRate: body.maxHeartRate,
+                restingHeartRate: body.restingHeartRate,
+                leanMass: body.leanMass,
             },
             select: {
                 id: true,
                 email: true,
                 role: true,
                 avatarUrl: true,
+                name: true,
+                birthDate: true,
+                gender: true,
+                height: true,
+                weight: true,
+                maxHeartRate: true,
+                restingHeartRate: true,
+                leanMass: true,
             },
         });
     }
@@ -108,6 +170,49 @@ export class UsersController {
                     }
                 }
             }
+        });
+    }
+
+    @Patch(':id')
+    async update(
+        @Param('id') id: string,
+        @Body() body: {
+            name?: string;
+            birthDate?: string;
+            gender?: Gender;
+            height?: number;
+            weight?: number;
+            maxHeartRate?: number;
+            restingHeartRate?: number;
+            leanMass?: number;
+        },
+    ) {
+        return this.prisma.user.update({
+            where: { id },
+            data: {
+                name: body.name,
+                birthDate: body.birthDate ? new Date(body.birthDate) : undefined,
+                gender: body.gender,
+                height: body.height,
+                weight: body.weight,
+                maxHeartRate: body.maxHeartRate,
+                restingHeartRate: body.restingHeartRate,
+                leanMass: body.leanMass,
+            },
+            select: {
+                id: true,
+                email: true,
+                role: true,
+                avatarUrl: true,
+                name: true,
+                birthDate: true,
+                gender: true,
+                height: true,
+                weight: true,
+                maxHeartRate: true,
+                restingHeartRate: true,
+                leanMass: true,
+            },
         });
     }
 

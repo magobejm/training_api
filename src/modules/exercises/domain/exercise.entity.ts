@@ -13,6 +13,7 @@ export class Exercise {
     public readonly updatedBy: string | null,
     public readonly deletedAt: Date | null,
     public readonly deletedBy: string | null,
+    public readonly muscleGroupDetails?: { id: string; name: string; imageUrl: string | null },
   ) { }
 
   static create(
@@ -38,6 +39,7 @@ export class Exercise {
       null,
       null,
       null,
+      undefined, // muscleGroupDetails
     );
   }
 }

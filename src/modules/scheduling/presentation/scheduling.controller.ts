@@ -59,16 +59,20 @@ export class SchedulingController {
             completed: workout.completed,
             reminderSent: workout.reminderSent,
             notes: workout.notes,
+            clientName: workout.clientName,
+            planName: workout.planName,
+            dayName: workout.dayName,
         };
     }
 
     @Get()
     async getUpcoming(
         @Query() query: GetScheduleQueryDto,
-        @CurrentUser('sub') userId: string,
+        @CurrentUser() user: any,
     ) {
         const workouts = await this.getUpcomingUseCase.execute({
-            userId,
+            userId: user.userId,
+            trainerId: user.role === 'TRAINER' ? user.userId : undefined,
             startDate: query.startDate ? new Date(query.startDate) : undefined,
             endDate: query.endDate ? new Date(query.endDate) : undefined,
         });
@@ -82,6 +86,9 @@ export class SchedulingController {
                 completed: w.completed,
                 reminderSent: w.reminderSent,
                 notes: w.notes,
+                clientName: w.clientName,
+                planName: w.planName,
+                dayName: w.dayName,
             })),
             total: workouts.length,
         };
@@ -91,7 +98,7 @@ export class SchedulingController {
     async reschedule(
         @Param('workoutId') workoutId: string,
         @Body() dto: RescheduleWorkoutDto,
-        @CurrentUser('sub') userId: string,
+        @CurrentUser('userId') userId: string,
     ) {
         const workout = await this.rescheduleUseCase.execute({
             scheduledWorkoutId: workoutId,
@@ -108,7 +115,7 @@ export class SchedulingController {
     @Delete(':workoutId')
     async cancel(
         @Param('workoutId') workoutId: string,
-        @CurrentUser('sub') userId: string,
+        @CurrentUser('userId') userId: string,
     ) {
         await this.cancelUseCase.execute({
             scheduledWorkoutId: workoutId,

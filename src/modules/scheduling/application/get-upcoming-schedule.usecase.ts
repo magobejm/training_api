@@ -13,10 +13,12 @@ export class GetUpcomingScheduleUseCase {
         userId: string;
         startDate?: Date;
         endDate?: Date;
+        trainerId?: string;
     }): Promise<ScheduledWorkout[]> {
         return this.repository.findUpcoming(command.userId, {
             startDate: command.startDate,
             endDate: command.endDate,
+            trainerId: command.trainerId,
         });
     }
 }

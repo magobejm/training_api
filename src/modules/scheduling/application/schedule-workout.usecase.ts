@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, ForbiddenException } from '@nestjs/common';
 import { ISchedulingRepository } from '../domain/scheduling.repository';
 import { ScheduledWorkout } from '../domain/scheduled-workout.entity';
 
@@ -16,6 +16,16 @@ export class ScheduleWorkoutUseCase {
         scheduledFor: Date;
         notes?: string;
     }): Promise<ScheduledWorkout> {
+        // Check for overlap
+        const hasOverlap = await this.repository.hasOverlap(
+            command.userId,
+            command.scheduledFor
+        );
+
+        if (hasOverlap) {
+            throw new ForbiddenException('The client already has a session scheduled at this time');
+        }
+
         const workout = ScheduledWorkout.create(
             command.userId,
             command.trainerId,

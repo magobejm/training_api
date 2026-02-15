@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { Role } from '@prisma/client';
+import { RoleEnum } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -22,11 +22,15 @@ export class AdminService {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        // Fetch Role ID for TRAINER
+        const roleRecord = await this.prisma.role.findUnique({ where: { name: 'TRAINER' } });
+
         const user = await this.prisma.user.create({
             data: {
                 email,
                 password: hashedPassword,
-                role: Role.TRAINER,
+                role: RoleEnum.TRAINER,
+                roleId: roleRecord?.id,
             },
         });
 
@@ -37,7 +41,7 @@ export class AdminService {
     async getAllTrainers() {
         return this.prisma.user.findMany({
             where: {
-                role: Role.TRAINER,
+                role: RoleEnum.TRAINER,
                 deletedAt: null,
             },
             select: {
@@ -55,7 +59,7 @@ export class AdminService {
 
     async deleteTrainer(id: string) {
         const user = await this.prisma.user.findUnique({ where: { id } });
-        if (!user || user.role !== Role.TRAINER) {
+        if (!user || user.role !== RoleEnum.TRAINER) {
             throw new NotFoundException('Trainer not found');
         }
 
@@ -70,7 +74,7 @@ export class AdminService {
 
     async resetTrainerPassword(id: string, newPassword: string) {
         const user = await this.prisma.user.findUnique({ where: { id } });
-        if (!user || user.role !== Role.TRAINER) {
+        if (!user || user.role !== RoleEnum.TRAINER) {
             throw new NotFoundException('Trainer not found');
         }
 

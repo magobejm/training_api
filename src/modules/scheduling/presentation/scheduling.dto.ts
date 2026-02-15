@@ -6,8 +6,9 @@ import {
 } from 'class-validator';
 
 export class ScheduleWorkoutDto {
+    @IsOptional()
     @IsUUID()
-    trainerId: string;
+    trainerId?: string;
 
     @IsOptional()
     @IsUUID()

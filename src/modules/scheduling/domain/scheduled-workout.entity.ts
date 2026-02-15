@@ -10,6 +10,9 @@ export class ScheduledWorkout {
         public readonly notes: string | null,
         public readonly createdAt: Date,
         public readonly updatedAt: Date,
+        public readonly clientName?: string,
+        public readonly planName?: string,
+        public readonly dayName?: string,
     ) { }
 
     static create(
@@ -45,6 +48,9 @@ export class ScheduledWorkout {
             this.notes,
             this.createdAt,
             new Date(),
+            this.clientName,
+            this.planName,
+            this.dayName,
         );
     }
 }

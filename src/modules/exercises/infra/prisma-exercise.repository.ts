@@ -22,6 +22,10 @@ export class PrismaExerciseRepository implements IExerciseRepository {
         updatedAt: exercise.updatedAt,
         createdBy: exercise.createdBy,
         updatedBy: exercise.updatedBy,
+        muscleGroupId: exercise.muscleGroupDetails?.id, // If provided (unlikely in create, usually handled by service/logic)
+      },
+      include: {
+        targetMuscleGroup: true,
       },
     });
     return this.mapToDomain(raw);
@@ -30,6 +34,9 @@ export class PrismaExerciseRepository implements IExerciseRepository {
   async findAll(): Promise<Exercise[]> {
     const raw = await this.prisma.exercise.findMany({
       where: { deletedAt: null },
+      include: {
+        targetMuscleGroup: true,
+      },
     });
     return raw.map((item) => this.mapToDomain(item));
   }
@@ -37,6 +44,9 @@ export class PrismaExerciseRepository implements IExerciseRepository {
   async findById(id: string): Promise<Exercise | null> {
     const raw = await this.prisma.exercise.findUnique({
       where: { id },
+      include: {
+        targetMuscleGroup: true,
+      },
     });
     if (!raw || raw.deletedAt) return null;
     return this.mapToDomain(raw);
@@ -54,6 +64,9 @@ export class PrismaExerciseRepository implements IExerciseRepository {
         thumbnailUrl: data.thumbnailUrl,
         updatedAt: new Date(),
         updatedBy: data.updatedBy,
+      },
+      include: {
+        targetMuscleGroup: true,
       },
     });
     return this.mapToDomain(raw);
@@ -75,6 +88,9 @@ export class PrismaExerciseRepository implements IExerciseRepository {
         id: { in: ids },
         deletedAt: null,
       },
+      include: {
+        targetMuscleGroup: true,
+      },
     });
     return raw.map((item) => this.mapToDomain(item));
   }
@@ -89,7 +105,7 @@ export class PrismaExerciseRepository implements IExerciseRepository {
     return count > 0;
   }
 
-  private mapToDomain(raw: PrismaExercise): Exercise {
+  private mapToDomain(raw: PrismaExercise & { targetMuscleGroup?: { id: string, name: string, imageUrl: string | null } | null }): Exercise {
     return new Exercise(
       raw.id,
       raw.name,
@@ -104,6 +120,11 @@ export class PrismaExerciseRepository implements IExerciseRepository {
       raw.updatedBy,
       raw.deletedAt,
       raw.deletedBy,
+      raw.targetMuscleGroup ? {
+        id: raw.targetMuscleGroup.id,
+        name: raw.targetMuscleGroup.name,
+        imageUrl: raw.targetMuscleGroup.imageUrl
+      } : undefined,
     );
   }
 }

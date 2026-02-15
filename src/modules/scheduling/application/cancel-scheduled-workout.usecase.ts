@@ -26,9 +26,9 @@ export class CancelScheduledWorkoutUseCase {
         }
 
         // Ownership check
-        if (workout.userId !== command.userId) {
+        if (workout.userId !== command.userId && workout.trainerId !== command.userId) {
             throw new ForbiddenException(
-                'You can only cancel your own workouts',
+                'You can only cancel your own workouts or those you manage',
             );
         }
 

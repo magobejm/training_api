@@ -8,10 +8,12 @@ export interface ISchedulingRepository {
         filters?: {
             startDate?: Date;
             endDate?: Date;
+            trainerId?: string;
         },
     ): Promise<ScheduledWorkout[]>;
     updateScheduledWorkout(workout: ScheduledWorkout): Promise<ScheduledWorkout>;
     deleteScheduledWorkout(id: string): Promise<void>;
+    hasOverlap(userId: string, scheduledFor: Date, excludeId?: string): Promise<boolean>;
 }
 
 export const ISchedulingRepository = Symbol('ISchedulingRepository');

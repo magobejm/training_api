@@ -18,14 +18,10 @@ export class UpdateExerciseDto {
 
     @IsOptional()
     @IsUrl({}, { message: 'El URL del video debe ser válido' })
-    videoUrl?: string;
+    defaultVideoUrl?: string;
 
     @IsOptional()
     @IsUrl({}, { message: 'El URL de la imagen debe ser válido' })
-    imageUrl?: string;
-
-    @IsOptional()
-    @IsUrl({}, { message: 'El URL de la imagen por defecto debe ser válido' })
     defaultImageUrl?: string;
 
     @IsOptional()
