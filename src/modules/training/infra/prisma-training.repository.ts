@@ -12,12 +12,14 @@ import {
   Exercise as PrismaExercise,
 } from '@prisma/client';
 
-type FullPlan = PrismaTrainingPlan & {
-  days: (PrismaTrainingDay & {
-    exercises: (PrismaDayExercise & {
-      exercise: PrismaExercise;
-    })[];
+type FullExercise = PrismaExercise & { targetMuscleGroup: { name: string } | null };
+type FullDay = PrismaTrainingDay & {
+  exercises: (PrismaDayExercise & {
+    exercise: FullExercise;
   })[];
+};
+type FullPlan = PrismaTrainingPlan & {
+  days: FullDay[];
 };
 
 @Injectable()
@@ -64,14 +66,14 @@ export class PrismaTrainingRepository implements ITrainingRepository {
           include: {
             exercises: {
               orderBy: { order: 'asc' },
-              include: { exercise: true },
+              include: { exercise: { include: { targetMuscleGroup: true } } },
             },
           },
         },
       },
     });
 
-    return this.mapPlanToDomain(raw);
+    return this.mapPlanToDomain(raw as FullPlan);
   }
 
   async createDay(day: TrainingDay): Promise<TrainingDay> {
@@ -86,11 +88,11 @@ export class PrismaTrainingRepository implements ITrainingRepository {
       },
       include: {
         exercises: {
-          include: { exercise: true },
+          include: { exercise: { include: { targetMuscleGroup: true } } },
         },
       },
     });
-    return this.mapDayToDomain(raw);
+    return this.mapDayToDomain(raw as FullDay);
   }
 
   async getDayById(id: string): Promise<TrainingDay | null> {
@@ -98,13 +100,13 @@ export class PrismaTrainingRepository implements ITrainingRepository {
       where: { id },
       include: {
         exercises: {
-          include: { exercise: true },
+          include: { exercise: { include: { targetMuscleGroup: true } } },
         },
       },
     });
 
     if (!raw) return null;
-    return this.mapDayToDomain(raw);
+    return this.mapDayToDomain(raw as FullDay);
   }
 
   async addExerciseToDay(dayExercise: DayExercise): Promise<DayExercise> {
@@ -124,10 +126,10 @@ export class PrismaTrainingRepository implements ITrainingRepository {
         coachNotes: dayExercise.coachNotes,
       },
       include: {
-        exercise: true,
+        exercise: { include: { targetMuscleGroup: true } },
       },
     });
-    return this.mapDayExerciseToDomain(raw);
+    return this.mapDayExerciseToDomain(raw as PrismaDayExercise & { exercise: FullExercise });
   }
 
   async getPlanById(id: string): Promise<TrainingPlan | null> {
@@ -139,7 +141,7 @@ export class PrismaTrainingRepository implements ITrainingRepository {
           include: {
             exercises: {
               orderBy: { order: 'asc' },
-              include: { exercise: true },
+              include: { exercise: { include: { targetMuscleGroup: true } } },
             },
           },
         },
@@ -147,7 +149,7 @@ export class PrismaTrainingRepository implements ITrainingRepository {
     });
 
     if (!raw) return null;
-    return this.mapPlanToDomain(raw);
+    return this.mapPlanToDomain(raw as FullPlan);
   }
 
   async findAll(authorId?: string): Promise<TrainingPlan[]> {
@@ -176,7 +178,7 @@ export class PrismaTrainingRepository implements ITrainingRepository {
           include: {
             exercises: {
               orderBy: { order: 'asc' },
-              include: { exercise: true },
+              include: { exercise: { include: { targetMuscleGroup: true } } },
             },
           },
         },
@@ -184,7 +186,7 @@ export class PrismaTrainingRepository implements ITrainingRepository {
       orderBy: { createdAt: 'desc' },
     });
 
-    return raw.map((plan) => this.mapPlanToDomain(plan));
+    return raw.map((plan) => this.mapPlanToDomain(plan as FullPlan));
   }
 
   private mapPlanToDomain(raw: FullPlan): TrainingPlan {
@@ -199,11 +201,7 @@ export class PrismaTrainingRepository implements ITrainingRepository {
     );
   }
 
-  private mapDayToDomain(
-    raw: PrismaTrainingDay & {
-      exercises: (PrismaDayExercise & { exercise: PrismaExercise })[];
-    },
-  ): TrainingDay {
+  private mapDayToDomain(raw: FullDay): TrainingDay {
     return new TrainingDay(
       raw.id,
       raw.name,
@@ -215,14 +213,12 @@ export class PrismaTrainingRepository implements ITrainingRepository {
     );
   }
 
-  private mapDayExerciseToDomain(
-    raw: PrismaDayExercise & { exercise: PrismaExercise },
-  ): DayExercise {
+  private mapDayExerciseToDomain(raw: PrismaDayExercise & { exercise: FullExercise }): DayExercise {
     const baseExercise = new Exercise(
       raw.exercise.id,
       raw.exercise.name,
       raw.exercise.description,
-      raw.exercise.muscleGroup,
+      raw.exercise.targetMuscleGroup?.name || 'UNKNOWN',
       raw.exercise.defaultVideoUrl,
       raw.exercise.defaultImageUrl,
       raw.exercise.thumbnailUrl,
@@ -232,6 +228,7 @@ export class PrismaTrainingRepository implements ITrainingRepository {
       raw.exercise.updatedBy,
       raw.exercise.deletedAt,
       raw.exercise.deletedBy,
+      raw.exercise.trainerId,
     );
 
     return new DayExercise(

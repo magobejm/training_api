@@ -14,7 +14,7 @@ export class PrismaExerciseRepository implements IExerciseRepository {
         id: exercise.id,
         name: exercise.name,
         description: exercise.description,
-        muscleGroup: exercise.muscleGroup,
+        // muscleGroup: exercise.muscleGroup, // Removed: handled by relation
         defaultVideoUrl: exercise.defaultVideoUrl,
         defaultImageUrl: exercise.defaultImageUrl,
         thumbnailUrl: exercise.thumbnailUrl,
@@ -22,8 +22,9 @@ export class PrismaExerciseRepository implements IExerciseRepository {
         updatedAt: exercise.updatedAt,
         createdBy: exercise.createdBy,
         updatedBy: exercise.updatedBy,
-        muscleGroupId: exercise.muscleGroupDetails?.id, // If provided (unlikely in create, usually handled by service/logic)
-      },
+        muscleGroupId: exercise.muscleGroupDetails?.id as string,
+        trainerId: exercise.trainerId,
+      } as any,
       include: {
         targetMuscleGroup: true,
       },
@@ -31,9 +32,15 @@ export class PrismaExerciseRepository implements IExerciseRepository {
     return this.mapToDomain(raw);
   }
 
-  async findAll(): Promise<Exercise[]> {
+  async findAll(userId: string): Promise<Exercise[]> {
     const raw = await this.prisma.exercise.findMany({
-      where: { deletedAt: null },
+      where: {
+        deletedAt: null,
+        OR: [
+          { trainerId: null }, // Common exercises
+          { trainerId: userId }, // Private exercises
+        ],
+      },
       include: {
         targetMuscleGroup: true,
       },
@@ -58,13 +65,14 @@ export class PrismaExerciseRepository implements IExerciseRepository {
       data: {
         name: data.name,
         description: data.description,
-        muscleGroup: data.muscleGroup,
+        // muscleGroup: data.muscleGroup, // Removed: handled by relation if any
         defaultVideoUrl: data.defaultVideoUrl,
         defaultImageUrl: data.defaultImageUrl,
         thumbnailUrl: data.thumbnailUrl,
         updatedAt: new Date(),
         updatedBy: data.updatedBy,
-      },
+        muscleGroupId: data.muscleGroupDetails?.id,
+      } as any,
       include: {
         targetMuscleGroup: true,
       },
@@ -73,36 +81,31 @@ export class PrismaExerciseRepository implements IExerciseRepository {
   }
 
   async delete(id: string): Promise<void> {
-    // Soft delete
     await this.prisma.exercise.update({
       where: { id },
-      data: {
-        deletedAt: new Date(),
-      },
+      data: { deletedAt: new Date() },
     });
   }
 
   async findAllByIds(ids: string[]): Promise<Exercise[]> {
     const raw = await this.prisma.exercise.findMany({
-      where: {
-        id: { in: ids },
-        deletedAt: null,
-      },
-      include: {
-        targetMuscleGroup: true,
-      },
+      where: { id: { in: ids }, deletedAt: null },
+      include: { targetMuscleGroup: true },
     });
     return raw.map((item) => this.mapToDomain(item));
   }
 
   async hasDayExercises(id: string): Promise<boolean> {
     const count = await this.prisma.dayExercise.count({
-      where: {
-        exerciseId: id,
-        deletedAt: null,
-      },
+      where: { exerciseId: id },
     });
     return count > 0;
+  }
+
+  async findAllMuscleGroups(): Promise<{ id: string; name: string; imageUrl: string | null }[]> {
+    return this.prisma.muscleGroup.findMany({
+      orderBy: { name: 'asc' },
+    });
   }
 
   private mapToDomain(raw: PrismaExercise & { targetMuscleGroup?: { id: string, name: string, imageUrl: string | null } | null }): Exercise {
@@ -110,7 +113,7 @@ export class PrismaExerciseRepository implements IExerciseRepository {
       raw.id,
       raw.name,
       raw.description,
-      raw.muscleGroup,
+      raw.targetMuscleGroup?.name || 'UNKNOWN', // Map from relation
       raw.defaultVideoUrl,
       raw.defaultImageUrl,
       raw.thumbnailUrl,
@@ -120,6 +123,7 @@ export class PrismaExerciseRepository implements IExerciseRepository {
       raw.updatedBy,
       raw.deletedAt,
       raw.deletedBy,
+      raw.trainerId,
       raw.targetMuscleGroup ? {
         id: raw.targetMuscleGroup.id,
         name: raw.targetMuscleGroup.name,

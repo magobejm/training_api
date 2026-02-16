@@ -14,7 +14,7 @@ export declare class ExercisesController {
     private readonly deleteExerciseUseCase;
     constructor(createExerciseUseCase: CreateExerciseUseCase, getExercisesUseCase: GetExercisesUseCase, getExerciseByIdUseCase: GetExerciseByIdUseCase, updateExerciseUseCase: UpdateExerciseUseCase, deleteExerciseUseCase: DeleteExerciseUseCase);
     create(dto: CreateExerciseDto, user: AuthenticatedUser): Promise<import("../domain/exercise.entity").Exercise>;
-    findAll(): Promise<import("../domain/exercise.entity").Exercise[]>;
+    findAll(user: AuthenticatedUser): Promise<import("../domain/exercise.entity").Exercise[]>;
     findOne(id: string): Promise<import("../domain/exercise.entity").Exercise>;
     update(id: string, dto: UpdateExerciseDto, user: AuthenticatedUser): Promise<import("../domain/exercise.entity").Exercise>;
     remove(id: string, user: AuthenticatedUser): Promise<void>;

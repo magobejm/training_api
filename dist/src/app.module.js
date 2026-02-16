@@ -21,6 +21,7 @@ const users_module_1 = require("./users/users.module");
 const admin_module_1 = require("./modules/admin/admin.module");
 const health_module_1 = require("./modules/health/health.module");
 const dashboard_module_1 = require("./modules/dashboard/dashboard.module");
+const coach_notes_module_1 = require("./modules/coach-notes/coach-notes.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -40,6 +41,7 @@ exports.AppModule = AppModule = __decorate([
             admin_module_1.AdminModule,
             health_module_1.HealthModule,
             dashboard_module_1.DashboardModule,
+            coach_notes_module_1.CoachNotesModule,
         ],
     })
 ], AppModule);

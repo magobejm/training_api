@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { User, RoleEnum } from '@prisma/client';
+import { User } from '@prisma/client';
+import { RoleEnum } from './domain/role.enum';
 
 @Injectable()
 export class AuthService {
@@ -23,7 +24,7 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const payload = { email: user.email, sub: user.id, role: user.role };
+    const payload = { email: user.email, sub: user.id, role: user.userRole?.name || user.role };
     const { password, userRole, ...userWithoutPassword } = user;
 
     return {
@@ -32,18 +33,23 @@ export class AuthService {
         id: userWithoutPassword.id,
         email: userWithoutPassword.email,
         name: userWithoutPassword.name,
-        role: userRole,
+        role: userWithoutPassword.userRole || { name: userWithoutPassword.role },
         avatarUrl: userWithoutPassword.avatarUrl,
       },
     };
   }
 
-  async register(registerDto: { email: string; password: string; name?: string; role: RoleEnum; avatarUrl?: string }) {
-    const { email, password, name, role, avatarUrl } = registerDto;
+  async register(registerDto: { email: string; password: string; name?: string; role: RoleEnum; avatarUrl?: string, phone?: string, goal?: string }) {
+    const { email, password, name, role, avatarUrl, phone, goal } = registerDto;
     // Check if user exists (including soft-deleted)
     const existingUser = await this.prisma.user.findUnique({
       where: { email },
     });
+
+    // If user exists and is NOT soft-deleted, throw Conflict
+    if (existingUser && !existingUser.deletedAt) {
+      throw new ConflictException('Email already in use');
+    }
 
     // If user was soft-deleted, reactivate them
     if (existingUser && existingUser.deletedAt) {
@@ -55,18 +61,22 @@ export class AuthService {
           password: hashedPassword,
           name: name || existingUser.name, // Keep existing name if not provided
           avatarUrl: avatarUrl || existingUser.avatarUrl,
+          phone: phone || existingUser.phone,
+          goal: goal || existingUser.goal,
           deletedAt: null,
           deletedBy: null,
           updatedAt: new Date(),
+          // role: role, // Removed legacy column update, reliance on relation handled below if we wanted to change role?
+          // For now assuming role doesn't change on reactivation unless specified.
         },
         include: { userRole: true }
-      });
+      }) as any;
 
       return {
         id: reactivatedUser.id,
         email: reactivatedUser.email,
         name: reactivatedUser.name,
-        role: reactivatedUser.userRole,
+        role: reactivatedUser.userRole || { name: role || RoleEnum.CLIENT },
       };
     }
 
@@ -81,18 +91,19 @@ export class AuthService {
         email,
         password: hashedPassword,
         name: name || email.split('@')[0], // Default name
-        role: role || RoleEnum.CLIENT,
         avatarUrl,
-        roleId: userRole?.id,
-      },
+        phone,
+        goal,
+        roleId: userRole?.id as string,
+      } as any,
       include: { userRole: true }
-    });
+    }) as any;
 
     return {
       id: user.id,
       email: user.email,
       name: user.name,
-      role: user.userRole,
+      role: user.userRole || { name: role || RoleEnum.CLIENT },
     };
   }
 

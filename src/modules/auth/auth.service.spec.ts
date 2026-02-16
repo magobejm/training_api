@@ -3,7 +3,8 @@ import { AuthService } from './auth.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { User, Role } from '@prisma/client';
+import { User } from '@prisma/client';
+import { RoleEnum } from './domain/role.enum';
 
 describe('AuthService', () => {
     let service: AuthService;
@@ -17,6 +18,9 @@ describe('AuthService', () => {
             create: jest.fn(),
             update: jest.fn(),
         },
+        role: {
+            findUnique: jest.fn(),
+        }
     };
 
     const mockJwtService = {
@@ -53,7 +57,6 @@ describe('AuthService', () => {
                 id: '1',
                 email: 'test@example.com',
                 password: hashedPassword,
-                role: Role.CLIENT,
                 deletedAt: null,
             } as any;
 
@@ -91,11 +94,11 @@ describe('AuthService', () => {
 
     describe('login', () => {
         it('should return access token', async () => {
-            const user: User = {
+            const user = {
                 id: '1',
                 email: 'test@example.com',
                 password: 'hash',
-                role: Role.CLIENT,
+                userRole: { name: RoleEnum.CLIENT },
             } as any;
             const token = 'jwt-token';
 
@@ -108,13 +111,13 @@ describe('AuthService', () => {
                 user: {
                     id: user.id,
                     email: user.email,
-                    role: user.role,
+                    role: RoleEnum.CLIENT,
                 },
             });
             expect(mockJwtService.signAsync).toHaveBeenCalledWith({
                 email: user.email,
                 sub: user.id,
-                role: user.role,
+                role: RoleEnum.CLIENT,
             });
         });
     });
@@ -123,23 +126,26 @@ describe('AuthService', () => {
         it('should create a new user', async () => {
             const email = 'new@example.com';
             const password = 'password';
-            const role = Role.CLIENT;
-            const createdUser: User = {
+            const role = RoleEnum.CLIENT;
+            const createdUser = {
                 id: '1',
                 email,
                 password: 'hash',
-                role,
+                name: email.split('@')[0],
+                userRole: { name: role },
             } as any;
 
             mockPrismaService.user.findUnique.mockResolvedValue(null);
+            mockPrismaService.role.findUnique.mockResolvedValue({ id: 'role-id', name: role });
             mockPrismaService.user.create.mockResolvedValue(createdUser);
 
-            const result = await service.register(email, password, role);
+            const result = await service.register({ email, password, role });
 
             expect(result).toEqual({
                 id: createdUser.id,
                 email: createdUser.email,
-                role: createdUser.role,
+                name: createdUser.name,
+                role: role,
             });
             expect(mockPrismaService.user.create).toHaveBeenCalled();
         });
@@ -147,25 +153,27 @@ describe('AuthService', () => {
         it('should reactivate a soft-deleted user', async () => {
             const email = 'deleted@example.com';
             const password = 'newpassword';
-            const role = Role.CLIENT;
-            const existingUser: User = {
+            const role = RoleEnum.CLIENT;
+            const existingUser = {
                 id: '1',
                 email,
                 password: 'oldhash',
-                role,
                 deletedAt: new Date(),
+                name: 'Deleted User',
+                userRole: { name: role },
             } as any;
             const updatedUser = { ...existingUser, deletedAt: null, password: 'newhash' };
 
             mockPrismaService.user.findUnique.mockResolvedValue(existingUser);
             mockPrismaService.user.update.mockResolvedValue(updatedUser);
 
-            const result = await service.register(email, password, role);
+            const result = await service.register({ email, password, role });
 
             expect(result).toEqual({
                 id: updatedUser.id,
                 email: updatedUser.email,
-                role: updatedUser.role,
+                name: updatedUser.name,
+                role: role,
             });
             expect(mockPrismaService.user.update).toHaveBeenCalled();
         });
@@ -180,7 +188,7 @@ describe('AuthService', () => {
             const user = { id: userId, password: hashedOld } as any;
 
             mockPrismaService.user.findUnique.mockResolvedValue(user);
-            mockPrismaService.user.update.mockResolvedValue(user); // return whatever
+            mockPrismaService.user.update.mockResolvedValue(user);
 
             await service.changePassword(userId, oldPass, newPass);
 

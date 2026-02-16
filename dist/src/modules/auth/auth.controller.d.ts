@@ -1,10 +1,13 @@
 import { AuthService } from './auth.service';
-import { RoleEnum } from '@prisma/client';
+import { RoleEnum } from './domain/role.enum';
 declare class RegisterDto {
     email: string;
     password: string;
     name?: string;
     role: RoleEnum;
+    phone?: string;
+    goal?: string;
+    avatarUrl?: string;
 }
 declare class LoginDto {
     email: string;
@@ -35,16 +38,10 @@ export declare class AuthController {
         };
     }>;
     register(body: RegisterDto): Promise<{
-        id: string;
-        email: string;
-        name: string | null;
-        role: {
-            id: string;
-            name: string;
-            createdAt: Date;
-            updatedAt: Date;
-            description: string | null;
-        } | null;
+        id: any;
+        email: any;
+        name: any;
+        role: any;
     }>;
     changePassword(req: any, body: ChangePasswordDto): Promise<{
         message: string;

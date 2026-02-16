@@ -42,8 +42,6 @@ describe('LogWorkoutSetUseCase', () => {
             new Date(),
             null,
             [],
-            0,
-            0,
             new Date(),
             new Date()
         );
@@ -79,8 +77,6 @@ describe('LogWorkoutSetUseCase', () => {
             new Date(),
             null,
             [],
-            0,
-            0,
             new Date(),
             new Date()
         );
@@ -107,8 +103,6 @@ describe('LogWorkoutSetUseCase', () => {
             new Date(),
             new Date(),
             [],
-            0,
-            0,
             new Date(),
             new Date()
         );

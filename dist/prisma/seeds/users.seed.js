@@ -53,7 +53,6 @@ async function seedUsers() {
         create: {
             email: 'trainer@example.com',
             password: hashedPassword,
-            role: 'TRAINER',
             roleId: trainerRole.id,
         },
     });
@@ -67,7 +66,6 @@ async function seedUsers() {
         create: {
             email: 'client@example.com',
             password: clientPassword,
-            role: 'CLIENT',
             roleId: clientRole.id,
         },
     });
@@ -81,7 +79,6 @@ async function seedUsers() {
         create: {
             email: 'admin@example.com',
             password: adminPassword,
-            role: 'ADMIN',
             roleId: adminRole.id,
         },
     });

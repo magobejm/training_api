@@ -37,10 +37,18 @@ let ExercisesController = class ExercisesController {
         this.deleteExerciseUseCase = deleteExerciseUseCase;
     }
     async create(dto, user) {
-        return this.createExerciseUseCase.execute({ ...dto, userId: user.userId });
+        return this.createExerciseUseCase.execute({
+            name: dto.name,
+            description: dto.description,
+            muscleGroup: dto.muscleGroup,
+            videoUrl: dto.defaultVideoUrl || undefined,
+            imageUrl: dto.defaultImageUrl || undefined,
+            thumbnailUrl: dto.thumbnailUrl || undefined,
+            userId: user.userId,
+        });
     }
-    async findAll() {
-        return this.getExercisesUseCase.execute();
+    async findAll(user) {
+        return this.getExercisesUseCase.execute(user.userId);
     }
     async findOne(id) {
         return this.getExerciseByIdUseCase.execute(id);
@@ -70,8 +78,9 @@ __decorate([
 ], ExercisesController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
+    __param(0, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], ExercisesController.prototype, "findAll", null);
 __decorate([

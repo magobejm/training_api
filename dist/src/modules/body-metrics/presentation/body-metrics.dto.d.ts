@@ -2,6 +2,11 @@ export declare class LogMetricDto {
     weight: number;
     height?: number;
     bodyFat?: number;
+    waist?: number;
+    hips?: number;
+    chest?: number;
+    arm?: number;
+    leg?: number;
     measurements?: Record<string, number>;
     notes?: string;
 }

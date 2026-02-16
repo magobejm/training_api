@@ -13,6 +13,7 @@ export class Exercise {
     public readonly updatedBy: string | null,
     public readonly deletedAt: Date | null,
     public readonly deletedBy: string | null,
+    public readonly trainerId: string | null,
     public readonly muscleGroupDetails?: { id: string; name: string; imageUrl: string | null },
   ) { }
 
@@ -24,6 +25,7 @@ export class Exercise {
     defaultImageUrl: string | null,
     thumbnailUrl: string | null,
     userId: string,
+    trainerId: string | null = null,
   ): Exercise {
     return new Exercise(
       crypto.randomUUID(),
@@ -39,6 +41,7 @@ export class Exercise {
       null,
       null,
       null,
+      trainerId,
       undefined, // muscleGroupDetails
     );
   }

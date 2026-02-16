@@ -61,7 +61,7 @@ let PrismaTrainingRepository = class PrismaTrainingRepository {
                     include: {
                         exercises: {
                             orderBy: { order: 'asc' },
-                            include: { exercise: true },
+                            include: { exercise: { include: { targetMuscleGroup: true } } },
                         },
                     },
                 },
@@ -81,7 +81,7 @@ let PrismaTrainingRepository = class PrismaTrainingRepository {
             },
             include: {
                 exercises: {
-                    include: { exercise: true },
+                    include: { exercise: { include: { targetMuscleGroup: true } } },
                 },
             },
         });
@@ -92,7 +92,7 @@ let PrismaTrainingRepository = class PrismaTrainingRepository {
             where: { id },
             include: {
                 exercises: {
-                    include: { exercise: true },
+                    include: { exercise: { include: { targetMuscleGroup: true } } },
                 },
             },
         });
@@ -117,7 +117,7 @@ let PrismaTrainingRepository = class PrismaTrainingRepository {
                 coachNotes: dayExercise.coachNotes,
             },
             include: {
-                exercise: true,
+                exercise: { include: { targetMuscleGroup: true } },
             },
         });
         return this.mapDayExerciseToDomain(raw);
@@ -131,7 +131,7 @@ let PrismaTrainingRepository = class PrismaTrainingRepository {
                     include: {
                         exercises: {
                             orderBy: { order: 'asc' },
-                            include: { exercise: true },
+                            include: { exercise: { include: { targetMuscleGroup: true } } },
                         },
                     },
                 },
@@ -165,7 +165,7 @@ let PrismaTrainingRepository = class PrismaTrainingRepository {
                     include: {
                         exercises: {
                             orderBy: { order: 'asc' },
-                            include: { exercise: true },
+                            include: { exercise: { include: { targetMuscleGroup: true } } },
                         },
                     },
                 },
@@ -181,7 +181,7 @@ let PrismaTrainingRepository = class PrismaTrainingRepository {
         return new training_day_entity_1.TrainingDay(raw.id, raw.name, raw.order, raw.planId, raw.exercises.map((e) => this.mapDayExerciseToDomain(e)), raw.createdAt, raw.updatedAt);
     }
     mapDayExerciseToDomain(raw) {
-        const baseExercise = new exercise_entity_1.Exercise(raw.exercise.id, raw.exercise.name, raw.exercise.description, raw.exercise.muscleGroup, raw.exercise.defaultVideoUrl, raw.exercise.defaultImageUrl, raw.exercise.thumbnailUrl, raw.exercise.createdAt, raw.exercise.updatedAt, raw.exercise.createdBy, raw.exercise.updatedBy, raw.exercise.deletedAt, raw.exercise.deletedBy);
+        const baseExercise = new exercise_entity_1.Exercise(raw.exercise.id, raw.exercise.name, raw.exercise.description, raw.exercise.targetMuscleGroup?.name || 'UNKNOWN', raw.exercise.defaultVideoUrl, raw.exercise.defaultImageUrl, raw.exercise.thumbnailUrl, raw.exercise.createdAt, raw.exercise.updatedAt, raw.exercise.createdBy, raw.exercise.updatedBy, raw.exercise.deletedAt, raw.exercise.deletedBy, raw.exercise.trainerId);
         return new day_exercise_entity_1.DayExercise(raw.id, raw.dayId, baseExercise, raw.order, raw.customDescription, raw.customVideoUrl, raw.customImageUrl, raw.coachNotes, raw.targetSets, raw.targetReps, raw.targetRir, raw.restSeconds);
     }
     async deletePlan(id) {

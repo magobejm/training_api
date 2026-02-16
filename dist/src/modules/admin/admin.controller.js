@@ -18,7 +18,7 @@ const admin_service_1 = require("./admin.service");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const roles_guard_1 = require("../auth/guards/roles.guard");
 const roles_decorator_1 = require("../auth/decorators/roles.decorator");
-const client_1 = require("@prisma/client");
+const role_enum_1 = require("../auth/domain/role.enum");
 const class_validator_1 = require("class-validator");
 class CreateTrainerDto {
     email;
@@ -91,7 +91,7 @@ __decorate([
 exports.AdminController = AdminController = __decorate([
     (0, common_1.Controller)('admin'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)(client_1.RoleEnum.ADMIN),
+    (0, roles_decorator_1.Roles)(role_enum_1.RoleEnum.ADMIN),
     __metadata("design:paramtypes", [admin_service_1.AdminService])
 ], AdminController);
 //# sourceMappingURL=admin.controller.js.map

@@ -15,13 +15,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
-const client_1 = require("@prisma/client");
+const role_enum_1 = require("./domain/role.enum");
 const class_validator_1 = require("class-validator");
 class RegisterDto {
     email;
     password;
     name;
     role;
+    phone;
+    goal;
+    avatarUrl;
 }
 __decorate([
     (0, class_validator_1.IsEmail)(),
@@ -39,9 +42,24 @@ __decorate([
 ], RegisterDto.prototype, "name", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsEnum)(client_1.RoleEnum),
+    (0, class_validator_1.IsEnum)(role_enum_1.RoleEnum),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "role", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], RegisterDto.prototype, "phone", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], RegisterDto.prototype, "goal", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], RegisterDto.prototype, "avatarUrl", void 0);
 class LoginDto {
     email;
     password;
@@ -107,6 +125,9 @@ let AuthController = class AuthController {
             password: body.password,
             name: body.name,
             role: body.role,
+            phone: body.phone,
+            goal: body.goal,
+            avatarUrl: body.avatarUrl,
         });
     }
     async changePassword(req, body) {

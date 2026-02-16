@@ -47,6 +47,10 @@ describe('GetExercisesUseCase', () => {
                 new Date(),
                 new Date(),
                 'user1',
+                null,
+                null,
+                null,
+                null,
             ),
             new Exercise(
                 '2',
@@ -59,14 +63,19 @@ describe('GetExercisesUseCase', () => {
                 new Date(),
                 new Date(),
                 'user1',
+                null,
+                null,
+                null,
+                null,
             ),
         ];
 
         mockExerciseRepository.findAll.mockResolvedValue(exercises);
+        const userId = 'user1';
 
-        const result = await service.execute();
+        const result = await service.execute(userId);
 
         expect(result).toEqual(exercises);
-        expect(mockExerciseRepository.findAll).toHaveBeenCalled();
+        expect(mockExerciseRepository.findAll).toHaveBeenCalledWith(userId);
     });
 });

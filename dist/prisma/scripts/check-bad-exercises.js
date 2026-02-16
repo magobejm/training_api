@@ -8,7 +8,7 @@ async function main() {
         where: {
             name: { startsWith: 'exercises' }
         },
-        select: { id: true, name: true, muscleGroup: true }
+        select: { id: true, name: true, targetMuscleGroup: { select: { name: true } } }
     });
     console.log(`Found ${ex1.length} starting with "exercises"`);
     ex1.forEach(ex => console.log(`- [${ex.name}]`));
@@ -17,7 +17,7 @@ async function main() {
         where: {
             name: { contains: '.' }
         },
-        select: { id: true, name: true, muscleGroup: true }
+        select: { id: true, name: true, targetMuscleGroup: { select: { name: true } } }
     });
     console.log(`Found ${ex2.length} containing "."`);
     ex2.forEach(ex => console.log(`- [${ex.name}]`));
@@ -31,11 +31,11 @@ async function main() {
         where: {
             name: { in: muscles }
         },
-        select: { id: true, name: true, muscleGroup: true }
+        select: { id: true, name: true, targetMuscleGroup: { select: { name: true } } }
     });
     console.log(`Found ${swapped.length} potentially swapped exercises.`);
-    swapped.forEach(ex => {
-        console.log(`- [${ex.id}] Name: "${ex.name}" | Muscle: "${ex.muscleGroup}"`);
+    swapped.forEach((ex) => {
+        console.log(`- [${ex.id}] Name: "${ex.name}" | Muscle: "${ex.targetMuscleGroup?.name}"`);
     });
 }
 main()

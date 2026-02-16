@@ -22,7 +22,7 @@ let LogBodyMetricUseCase = class LogBodyMetricUseCase {
         this.repository = repository;
     }
     async execute(command) {
-        const metric = body_metric_entity_1.BodyMetric.create(command.userId, command.weight, command.height, command.bodyFat, command.measurements, command.notes);
+        const metric = body_metric_entity_1.BodyMetric.create(command.userId, command.weight, command.height, command.bodyFat, command.measurements, command.notes, command.waist, command.hips, command.chest, command.arm, command.leg);
         return this.repository.logMetric(metric);
     }
 };

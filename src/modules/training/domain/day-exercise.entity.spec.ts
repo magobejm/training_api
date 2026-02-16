@@ -16,6 +16,7 @@ describe('DayExercise Logic', () => {
     null,
     null,
     null,
+    null,
   );
 
   it('should use base description and video when NO overrides are present', () => {

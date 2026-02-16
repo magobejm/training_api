@@ -47,6 +47,10 @@ describe('GetExerciseByIdUseCase', () => {
             new Date(),
             new Date(),
             'user-id',
+            null,
+            null,
+            null,
+            null,
         );
         mockExerciseRepository.findById.mockResolvedValue(exercise);
 

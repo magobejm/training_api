@@ -16,18 +16,21 @@ const delete_exercise_usecase_1 = require("./application/delete-exercise.usecase
 const prisma_exercise_repository_1 = require("./infra/prisma-exercise.repository");
 const exercises_controller_1 = require("./presentation/exercises.controller");
 const exercise_repository_1 = require("./domain/exercise.repository");
+const muscle_groups_controller_1 = require("./presentation/muscle-groups.controller");
+const get_muscle_groups_usecase_1 = require("./application/get-muscle-groups.usecase");
 let ExercisesModule = class ExercisesModule {
 };
 exports.ExercisesModule = ExercisesModule;
 exports.ExercisesModule = ExercisesModule = __decorate([
     (0, common_1.Module)({
-        controllers: [exercises_controller_1.ExercisesController],
+        controllers: [exercises_controller_1.ExercisesController, muscle_groups_controller_1.MuscleGroupsController],
         providers: [
             create_exercise_usecase_1.CreateExerciseUseCase,
             get_exercises_usecase_1.GetExercisesUseCase,
             get_exercise_by_id_usecase_1.GetExerciseByIdUseCase,
             update_exercise_usecase_1.UpdateExerciseUseCase,
             delete_exercise_usecase_1.DeleteExerciseUseCase,
+            get_muscle_groups_usecase_1.GetMuscleGroupsUseCase,
             {
                 provide: exercise_repository_1.IExerciseRepository,
                 useClass: prisma_exercise_repository_1.PrismaExerciseRepository,

@@ -41,6 +41,7 @@ let UsersController = class UsersController {
                 updatedAt: true,
                 name: true,
                 avatarUrl: true,
+                phone: true,
                 activePlan: {
                     select: {
                         id: true,
@@ -73,6 +74,7 @@ let UsersController = class UsersController {
                 deletedAt: true,
                 name: true,
                 avatarUrl: true,
+                phone: true,
                 birthDate: true,
                 gender: true,
                 height: true,
@@ -86,6 +88,13 @@ let UsersController = class UsersController {
                         name: true,
                         description: true,
                     }
+                },
+                _count: {
+                    select: {
+                        workoutSessions: {
+                            where: { status: 'COMPLETED' }
+                        }
+                    }
                 }
             },
         });
@@ -96,6 +105,8 @@ let UsersController = class UsersController {
             ...user,
             role: user.userRole,
             userRole: undefined,
+            completedWorkouts: user._count.workoutSessions,
+            _count: undefined,
         };
     }
     async updateProfile(user, body) {
@@ -111,6 +122,8 @@ let UsersController = class UsersController {
                 maxHeartRate: body.maxHeartRate,
                 restingHeartRate: body.restingHeartRate,
                 leanMass: body.leanMass,
+                phone: body.phone,
+                goal: body.goal,
             },
             select: {
                 id: true,
@@ -131,6 +144,8 @@ let UsersController = class UsersController {
                 maxHeartRate: true,
                 restingHeartRate: true,
                 leanMass: true,
+                phone: true,
+                goal: true,
             },
         });
         return {
@@ -176,6 +191,8 @@ let UsersController = class UsersController {
                 maxHeartRate: body.maxHeartRate,
                 restingHeartRate: body.restingHeartRate,
                 leanMass: body.leanMass,
+                phone: body.phone,
+                goal: body.goal,
             },
             select: {
                 id: true,
@@ -196,6 +213,8 @@ let UsersController = class UsersController {
                 maxHeartRate: true,
                 restingHeartRate: true,
                 leanMass: true,
+                phone: true,
+                goal: true,
             },
         });
         return {

@@ -8,6 +8,11 @@ export class BodyMetric {
         public readonly measurements: Record<string, number> | null,
         public readonly notes: string | null,
         public readonly loggedAt: Date,
+        public readonly waist: number | null,
+        public readonly hips: number | null,
+        public readonly chest: number | null,
+        public readonly arm: number | null,
+        public readonly leg: number | null,
     ) { }
 
     static create(
@@ -17,6 +22,11 @@ export class BodyMetric {
         bodyFat?: number,
         measurements?: Record<string, number>,
         notes?: string,
+        waist?: number,
+        hips?: number,
+        chest?: number,
+        arm?: number,
+        leg?: number,
     ): BodyMetric {
         return new BodyMetric(
             crypto.randomUUID(),
@@ -27,6 +37,11 @@ export class BodyMetric {
             measurements || null,
             notes || null,
             new Date(),
+            waist || null,
+            hips || null,
+            chest || null,
+            arm || null,
+            leg || null,
         );
     }
 }

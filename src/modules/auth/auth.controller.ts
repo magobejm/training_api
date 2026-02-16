@@ -1,6 +1,6 @@
 import { Controller, Post, Body, UseGuards, Get, Request, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { RoleEnum } from '@prisma/client';
+import { RoleEnum } from './domain/role.enum';
 import { Roles } from './decorators/roles.decorator';
 import { RolesGuard } from './guards/roles.guard';
 import { Public } from './decorators/public.decorator';
@@ -21,6 +21,18 @@ class RegisterDto {
   @IsOptional()
   @IsEnum(RoleEnum)
   role: RoleEnum;
+
+  @IsOptional()
+  @IsString()
+  phone?: string;
+
+  @IsOptional()
+  @IsString()
+  goal?: string;
+
+  @IsOptional()
+  @IsString()
+  avatarUrl?: string;
 }
 
 class LoginDto {
@@ -81,6 +93,9 @@ export class AuthController {
       password: body.password,
       name: body.name,
       role: body.role,
+      phone: body.phone,
+      goal: body.goal,
+      avatarUrl: body.avatarUrl,
     });
   }
 

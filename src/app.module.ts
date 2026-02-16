@@ -12,6 +12,7 @@ import { UsersModule } from './users/users.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { HealthModule } from './modules/health/health.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { CoachNotesModule } from './modules/coach-notes/coach-notes.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
     AdminModule,
     HealthModule,
     DashboardModule,
+    CoachNotesModule,
   ],
 })
 export class AppModule { }

@@ -16,6 +16,11 @@ export class LogBodyMetricUseCase {
         bodyFat?: number;
         measurements?: Record<string, number>;
         notes?: string;
+        waist?: number;
+        hips?: number;
+        chest?: number;
+        arm?: number;
+        leg?: number;
     }): Promise<BodyMetric> {
         const metric = BodyMetric.create(
             command.userId,
@@ -24,6 +29,11 @@ export class LogBodyMetricUseCase {
             command.bodyFat,
             command.measurements,
             command.notes,
+            command.waist,
+            command.hips,
+            command.chest,
+            command.arm,
+            command.leg,
         );
 
         return this.repository.logMetric(metric);

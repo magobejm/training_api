@@ -7,9 +7,9 @@ export class GetExercisesUseCase {
   constructor(
     @Inject(IExerciseRepository)
     private readonly exerciseRepository: IExerciseRepository,
-  ) {}
+  ) { }
 
-  async execute(): Promise<Exercise[]> {
-    return this.exerciseRepository.findAll();
+  async execute(userId: string): Promise<Exercise[]> {
+    return this.exerciseRepository.findAll(userId);
   }
 }

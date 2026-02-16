@@ -9,18 +9,18 @@ export declare class DashboardController {
         role: {
             id: string;
             name: string;
-            description: string | null;
             createdAt: Date;
             updatedAt: Date;
+            description: string | null;
         } | null;
         data: import("../dto/dashboard-stats.dto").TrainerStats;
     } | {
         role: {
             id: string;
             name: string;
-            description: string | null;
             createdAt: Date;
             updatedAt: Date;
+            description: string | null;
         } | null;
         data: import("../dto/dashboard-stats.dto").ClientStats;
     }>;

@@ -47,7 +47,7 @@ const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const prisma_service_1 = require("../../prisma/prisma.service");
 const bcrypt = __importStar(require("bcrypt"));
-const client_1 = require("@prisma/client");
+const role_enum_1 = require("./domain/role.enum");
 let AuthService = class AuthService {
     prisma;
     jwtService;
@@ -66,7 +66,7 @@ let AuthService = class AuthService {
         return null;
     }
     async login(user) {
-        const payload = { email: user.email, sub: user.id, role: user.role };
+        const payload = { email: user.email, sub: user.id, role: user.userRole?.name || user.role };
         const { password, userRole, ...userWithoutPassword } = user;
         return {
             accessToken: await this.jwtService.signAsync(payload),
@@ -74,16 +74,19 @@ let AuthService = class AuthService {
                 id: userWithoutPassword.id,
                 email: userWithoutPassword.email,
                 name: userWithoutPassword.name,
-                role: userRole,
+                role: userWithoutPassword.userRole || { name: userWithoutPassword.role },
                 avatarUrl: userWithoutPassword.avatarUrl,
             },
         };
     }
     async register(registerDto) {
-        const { email, password, name, role, avatarUrl } = registerDto;
+        const { email, password, name, role, avatarUrl, phone, goal } = registerDto;
         const existingUser = await this.prisma.user.findUnique({
             where: { email },
         });
+        if (existingUser && !existingUser.deletedAt) {
+            throw new common_1.ConflictException('Email already in use');
+        }
         if (existingUser && existingUser.deletedAt) {
             const hashedPassword = await bcrypt.hash(password, 10);
             const reactivatedUser = await this.prisma.user.update({
@@ -92,6 +95,8 @@ let AuthService = class AuthService {
                     password: hashedPassword,
                     name: name || existingUser.name,
                     avatarUrl: avatarUrl || existingUser.avatarUrl,
+                    phone: phone || existingUser.phone,
+                    goal: goal || existingUser.goal,
                     deletedAt: null,
                     deletedBy: null,
                     updatedAt: new Date(),
@@ -102,20 +107,21 @@ let AuthService = class AuthService {
                 id: reactivatedUser.id,
                 email: reactivatedUser.email,
                 name: reactivatedUser.name,
-                role: reactivatedUser.userRole,
+                role: reactivatedUser.userRole || { name: role || role_enum_1.RoleEnum.CLIENT },
             };
         }
         const hashedPassword = await bcrypt.hash(password, 10);
         const userRole = await this.prisma.role.findUnique({
-            where: { name: role || client_1.RoleEnum.CLIENT }
+            where: { name: role || role_enum_1.RoleEnum.CLIENT }
         });
         const user = await this.prisma.user.create({
             data: {
                 email,
                 password: hashedPassword,
                 name: name || email.split('@')[0],
-                role: role || client_1.RoleEnum.CLIENT,
                 avatarUrl,
+                phone,
+                goal,
                 roleId: userRole?.id,
             },
             include: { userRole: true }
@@ -124,7 +130,7 @@ let AuthService = class AuthService {
             id: user.id,
             email: user.email,
             name: user.name,
-            role: user.userRole,
+            role: user.userRole || { name: role || role_enum_1.RoleEnum.CLIENT },
         };
     }
     async changePassword(userId, oldPass, newPass) {

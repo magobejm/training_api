@@ -26,12 +26,20 @@ export class ExercisesController {
     @Body() dto: CreateExerciseDto,
     @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.createExerciseUseCase.execute({ ...dto, userId: user.userId });
+    return this.createExerciseUseCase.execute({
+      name: dto.name,
+      description: dto.description,
+      muscleGroup: dto.muscleGroup,
+      videoUrl: dto.defaultVideoUrl || undefined,
+      imageUrl: dto.defaultImageUrl || undefined,
+      thumbnailUrl: dto.thumbnailUrl || undefined,
+      userId: user.userId,
+    });
   }
 
   @Get()
-  async findAll() {
-    return this.getExercisesUseCase.execute();
+  async findAll(@CurrentUser() user: AuthenticatedUser) {
+    return this.getExercisesUseCase.execute(user.userId);
   }
 
   @Get(':id')

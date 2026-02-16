@@ -6,7 +6,7 @@ import { NotFoundException, ForbiddenException } from '@nestjs/common';
 
 const mockTrainingRepository = {
     getPlanById: jest.fn(),
-    addDay: jest.fn(),
+    createDay: jest.fn(),
 };
 
 describe('AddDayToPlanUseCase', () => {
@@ -41,18 +41,18 @@ describe('AddDayToPlanUseCase', () => {
         const command = {
             planId: plan.id,
             name: 'Day 1',
+            order: 1,
             userId: 'user1',
         };
 
         mockTrainingRepository.getPlanById.mockResolvedValue(plan);
-        mockTrainingRepository.addDay.mockResolvedValue(undefined);
+        mockTrainingRepository.createDay.mockResolvedValue({} as any);
 
         await service.execute(command);
 
         expect(mockTrainingRepository.getPlanById).toHaveBeenCalledWith(plan.id);
-        expect(mockTrainingRepository.addDay).toHaveBeenCalledWith(
-            plan.id,
-            expect.objectContaining({ name: 'Day 1' }),
+        expect(mockTrainingRepository.createDay).toHaveBeenCalledWith(
+            expect.objectContaining({ name: 'Day 1', planId: plan.id }),
         );
     });
 
@@ -60,7 +60,7 @@ describe('AddDayToPlanUseCase', () => {
         mockTrainingRepository.getPlanById.mockResolvedValue(null);
 
         await expect(
-            service.execute({ planId: 'invalid', name: 'Day 1', userId: 'user1' }),
+            service.execute({ planId: 'invalid', name: 'Day 1', order: 1, userId: 'user1' }),
         ).rejects.toThrow(NotFoundException);
     });
 
@@ -69,7 +69,7 @@ describe('AddDayToPlanUseCase', () => {
         mockTrainingRepository.getPlanById.mockResolvedValue(plan);
 
         await expect(
-            service.execute({ planId: plan.id, name: 'Day 1', userId: 'other' }),
+            service.execute({ planId: plan.id, name: 'Day 1', order: 1, userId: 'other' }),
         ).rejects.toThrow(ForbiddenException);
     });
 });

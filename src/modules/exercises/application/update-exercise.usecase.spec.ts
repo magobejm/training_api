@@ -51,6 +51,7 @@ describe('UpdateExerciseUseCase', () => {
             null,
             null,
             null,
+            null,
         );
 
         const updateData = {
@@ -103,6 +104,7 @@ describe('UpdateExerciseUseCase', () => {
             null,
             null,
             null,
+            null,
         );
 
         mockExerciseRepository.findById.mockResolvedValue(existingExercise);
@@ -128,6 +130,7 @@ describe('UpdateExerciseUseCase', () => {
             new Date(),
             new Date(),
             'user-id',
+            null,
             null,
             null,
             null,

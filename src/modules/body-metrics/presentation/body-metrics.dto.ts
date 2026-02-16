@@ -26,6 +26,31 @@ export class LogMetricDto {
     bodyFat?: number;
 
     @IsOptional()
+    @IsNumber()
+    @Min(0)
+    waist?: number;
+
+    @IsOptional()
+    @IsNumber()
+    @Min(0)
+    hips?: number;
+
+    @IsOptional()
+    @IsNumber()
+    @Min(0)
+    chest?: number;
+
+    @IsOptional()
+    @IsNumber()
+    @Min(0)
+    arm?: number;
+
+    @IsOptional()
+    @IsNumber()
+    @Min(0)
+    leg?: number;
+
+    @IsOptional()
     @IsObject()
     measurements?: Record<string, number>;
 

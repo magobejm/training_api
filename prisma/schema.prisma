@@ -7,12 +7,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-enum RoleEnum {
-  ADMIN
-  TRAINER
-  CLIENT
-}
-
 enum Gender {
   MALE
   FEMALE
@@ -72,13 +66,13 @@ model User {
   id       String  @id @default(uuid())
   email    String  @unique
   password String? @map("password_hash")
-  role     RoleEnum
   
-  // New Relation (Temporary optional)
-  roleId   String? @map("role_id")
-  userRole Role?   @relation(fields: [roleId], references: [id])
+  // Relation (Enforced)
+  roleId   String  @map("role_id")
+  userRole Role    @relation(fields: [roleId], references: [id])
 
   organizationId String?       @map("organization_id")
+  // ... rest of User model
   organization   Organization? @relation(fields: [organizationId], references: [id])
   name           String? // User's real name (e.g. John Doe)
   avatarUrl      String?       @map("avatar_url") // Custom profile picture url
@@ -91,6 +85,8 @@ model User {
   maxHeartRate     Int?      @map("max_heart_rate")
   restingHeartRate Int?      @map("resting_heart_rate")
   leanMass         Float?    @map("lean_mass") // %
+  phone            String?
+  goal             String?
 
   // Relations
   trainingPlans            TrainingPlan[]     @relation("CreatedPlans")
@@ -122,6 +118,12 @@ model User {
   trainingPlan      TrainingPlan? @relation(fields: [trainingPlanId], references: [id])
   trainingPlanId    String?
 
+  trainerExercises  Exercise[]    @relation("TrainerExercises")
+
+  // Coach Notes
+  clientNotes       CoachNote[]   @relation("ClientNotes")
+  authoredNotes     CoachNote[]   @relation("AuthorNotes")
+
   @@map("users")
 }
 
@@ -132,11 +134,14 @@ model Exercise {
   defaultVideoUrl String? @map("default_video_url")
   defaultImageUrl String? @map("default_image_url") // Cloudinary URL
   thumbnailUrl    String? @map("thumbnail_url") // Optional thumbnail
-  muscleGroup     String  @map("muscle_group")
   
-  // New Relation (Temporary optional)
-  muscleGroupId   String?      @map("muscle_group_id")
-  targetMuscleGroup MuscleGroup? @relation(fields: [muscleGroupId], references: [id])
+  // Relation (Enforced)
+  muscleGroupId   String      @map("muscle_group_id")
+  targetMuscleGroup MuscleGroup @relation(fields: [muscleGroupId], references: [id])
+
+  // Ownership
+  trainerId       String?     @map("trainer_id")
+  trainer         User?       @relation("TrainerExercises", fields: [trainerId], references: [id])
 
   // Audit fields
   createdAt DateTime @default(now()) @map("created_at")
@@ -310,7 +315,15 @@ model BodyMetric {
   weight       Float // kg, obligatorio
   height       Float? // cm, obligatorio en primer registro
   bodyFat      Float?  @map("body_fat") // %, opcional
-  measurements Json? // { chest, waist, hips, etc. }
+  
+  // New Metrics
+  waist        Float?  // cm
+  hips         Float?  // cm
+  chest        Float?  // cm
+  arm          Float?  // cm (avg/singular)
+  leg          Float?  // cm (avg/singular)
+
+  measurements Json? // { chest, waist, hips, etc. } - Original field kept for other measurements?
   notes        String?
 
   loggedAt DateTime @default(now()) @map("logged_at")
@@ -416,4 +429,23 @@ model ScheduledWorkout {
   @@index([trainerId])
   @@index([scheduledFor])
   @@map("scheduled_workouts")
+}
+
+model CoachNote {
+  id        String   @id @default(uuid())
+  clientId  String   @map("client_id")
+  authorId  String   @map("author_id")
+  
+  content   String   @db.Text
+  
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  client    User     @relation("ClientNotes", fields: [clientId], references: [id])
+  author    User     @relation("AuthorNotes", fields: [authorId], references: [id])
+
+  @@index([clientId])
+  @@index([authorId])
+  @@map("coach_notes")
 }

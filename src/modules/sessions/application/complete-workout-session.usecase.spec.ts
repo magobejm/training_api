@@ -41,8 +41,6 @@ describe('CompleteWorkoutSessionUseCase', () => {
             new Date(),
             null,
             [],
-            0,
-            0,
             new Date(),
             new Date()
         );
@@ -71,8 +69,6 @@ describe('CompleteWorkoutSessionUseCase', () => {
             new Date(),
             new Date(),
             [],
-            0,
-            0,
             new Date(),
             new Date()
         );
@@ -93,8 +89,6 @@ describe('CompleteWorkoutSessionUseCase', () => {
             new Date(),
             null,
             [],
-            0,
-            0,
             new Date(),
             new Date()
         );

@@ -63,15 +63,13 @@ async function importExercises() {
                     create: {
                         name,
                         description: 'Importado de Excel',
-                        muscleGroup: muscleGroupName,
                         muscleGroupId: muscleGroup.id,
                         defaultVideoUrl: videoUrl,
-                    },
+                    } as any,
                     update: {
-                        muscleGroup: muscleGroupName,
                         muscleGroupId: muscleGroup.id,
                         defaultVideoUrl: videoUrl,
-                    }
+                    } as any
                 }).catch(async () => {
                     // If upsert fails (e.g. ID issue), just findFirst and update, or create
                     const existing = await prisma.exercise.findFirst({ where: { name } });
@@ -80,9 +78,8 @@ async function importExercises() {
                             where: { id: existing.id },
                             data: {
                                 muscleGroupId: muscleGroup!.id,
-                                muscleGroup: muscleGroupName,
                                 defaultVideoUrl: videoUrl
-                            }
+                            } as any
                         });
                         console.log(`Updated: ${name}`);
                     } else {
@@ -90,10 +87,9 @@ async function importExercises() {
                             data: {
                                 name,
                                 description: 'Importado de Excel',
-                                muscleGroup: muscleGroupName,
                                 muscleGroupId: muscleGroup!.id,
                                 defaultVideoUrl: videoUrl,
-                            }
+                            } as any
                         });
                         console.log(`Created: ${name}`);
                     }
@@ -108,9 +104,8 @@ async function importExercises() {
                         data: {
                             name,
                             description: 'Importado de Excel',
-                            muscleGroup: muscleNameRaw || 'OTHER',
                             defaultVideoUrl: videoUrl,
-                        }
+                        } as any
                     });
                     console.log(`Created (No Master): ${name}`);
                 }
@@ -144,9 +139,8 @@ async function importExercises() {
                         data: {
                             name,
                             description: 'Ejercicio de cardio',
-                            muscleGroup: 'CARDIO',
                             muscleGroupId: cardioGroup.id,
-                        }
+                        } as any
                     });
                     console.log(`Created Cardio: ${name}`);
                 }

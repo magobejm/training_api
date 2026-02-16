@@ -21,6 +21,11 @@ export class PrismaBodyMetricRepository implements IBodyMetricRepository {
                 bodyFat: metric.bodyFat,
                 measurements: metric.measurements || undefined,
                 notes: metric.notes,
+                waist: metric.waist,
+                hips: metric.hips,
+                chest: metric.chest,
+                arm: metric.arm,
+                leg: metric.leg,
                 loggedAt: metric.loggedAt,
             },
         });
@@ -102,6 +107,11 @@ export class PrismaBodyMetricRepository implements IBodyMetricRepository {
             raw.measurements as Record<string, number> | null,
             raw.notes,
             raw.loggedAt,
+            raw.waist,
+            raw.hips,
+            raw.chest,
+            raw.arm,
+            raw.leg,
         );
     }
 

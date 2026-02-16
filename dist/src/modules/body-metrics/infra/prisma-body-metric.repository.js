@@ -28,6 +28,11 @@ let PrismaBodyMetricRepository = class PrismaBodyMetricRepository {
                 bodyFat: metric.bodyFat,
                 measurements: metric.measurements || undefined,
                 notes: metric.notes,
+                waist: metric.waist,
+                hips: metric.hips,
+                chest: metric.chest,
+                arm: metric.arm,
+                leg: metric.leg,
                 loggedAt: metric.loggedAt,
             },
         });
@@ -83,7 +88,7 @@ let PrismaBodyMetricRepository = class PrismaBodyMetricRepository {
         return photo ? this.mapPhotoToDomain(photo) : null;
     }
     mapMetricToDomain(raw) {
-        return new body_metric_entity_1.BodyMetric(raw.id, raw.userId, raw.weight, raw.height, raw.bodyFat, raw.measurements, raw.notes, raw.loggedAt);
+        return new body_metric_entity_1.BodyMetric(raw.id, raw.userId, raw.weight, raw.height, raw.bodyFat, raw.measurements, raw.notes, raw.loggedAt, raw.waist, raw.hips, raw.chest, raw.arm, raw.leg);
     }
     mapPhotoToDomain(raw) {
         return new body_metric_entity_1.ProgressPhoto(raw.id, raw.userId, raw.imageUrl, raw.caption, raw.loggedAt);

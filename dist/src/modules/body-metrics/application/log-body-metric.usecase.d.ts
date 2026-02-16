@@ -10,5 +10,10 @@ export declare class LogBodyMetricUseCase {
         bodyFat?: number;
         measurements?: Record<string, number>;
         notes?: string;
+        waist?: number;
+        hips?: number;
+        chest?: number;
+        arm?: number;
+        leg?: number;
     }): Promise<BodyMetric>;
 }

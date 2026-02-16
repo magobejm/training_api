@@ -8,14 +8,18 @@ import { PrismaExerciseRepository } from './infra/prisma-exercise.repository';
 import { ExercisesController } from './presentation/exercises.controller';
 import { IExerciseRepository } from './domain/exercise.repository';
 
+import { MuscleGroupsController } from './presentation/muscle-groups.controller';
+import { GetMuscleGroupsUseCase } from './application/get-muscle-groups.usecase';
+
 @Module({
-  controllers: [ExercisesController],
+  controllers: [ExercisesController, MuscleGroupsController],
   providers: [
     CreateExerciseUseCase,
     GetExercisesUseCase,
     GetExerciseByIdUseCase,
     UpdateExerciseUseCase,
     DeleteExerciseUseCase,
+    GetMuscleGroupsUseCase,
     {
       provide: IExerciseRepository,
       useClass: PrismaExerciseRepository,

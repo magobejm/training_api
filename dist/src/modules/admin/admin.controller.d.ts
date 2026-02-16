@@ -13,8 +13,7 @@ export declare class AdminController {
         id: string;
         email: string;
         resetToken: string | null;
-        role: import("@prisma/client").$Enums.RoleEnum;
-        roleId: string | null;
+        roleId: string;
         organizationId: string | null;
         name: string | null;
         avatarUrl: string | null;
@@ -25,6 +24,8 @@ export declare class AdminController {
         maxHeartRate: number | null;
         restingHeartRate: number | null;
         leanMass: number | null;
+        phone: string | null;
+        goal: string | null;
         activePlanId: string | null;
         createdAt: Date;
         updatedAt: Date;
@@ -38,16 +39,17 @@ export declare class AdminController {
     getAllTrainers(): Promise<{
         id: string;
         email: string;
-        role: import("@prisma/client").$Enums.RoleEnum;
         createdAt: Date;
+        userRole: {
+            name: string;
+        };
     }[]>;
     deleteTrainer(id: string): Promise<{
         id: string;
         email: string;
         resetToken: string | null;
         password: string | null;
-        role: import("@prisma/client").$Enums.RoleEnum;
-        roleId: string | null;
+        roleId: string;
         organizationId: string | null;
         name: string | null;
         avatarUrl: string | null;
@@ -58,6 +60,8 @@ export declare class AdminController {
         maxHeartRate: number | null;
         restingHeartRate: number | null;
         leanMass: number | null;
+        phone: string | null;
+        goal: string | null;
         activePlanId: string | null;
         createdAt: Date;
         updatedAt: Date;

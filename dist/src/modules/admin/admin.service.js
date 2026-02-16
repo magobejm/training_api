@@ -45,7 +45,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdminService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../prisma/prisma.service");
-const client_1 = require("@prisma/client");
 const bcrypt = __importStar(require("bcrypt"));
 let AdminService = class AdminService {
     prisma;
@@ -68,7 +67,6 @@ let AdminService = class AdminService {
             data: {
                 email,
                 password: hashedPassword,
-                role: client_1.RoleEnum.TRAINER,
                 roleId: roleRecord?.id,
             },
         });
@@ -78,13 +76,13 @@ let AdminService = class AdminService {
     async getAllTrainers() {
         return this.prisma.user.findMany({
             where: {
-                role: client_1.RoleEnum.TRAINER,
+                userRole: { name: 'TRAINER' },
                 deletedAt: null,
             },
             select: {
                 id: true,
                 email: true,
-                role: true,
+                userRole: { select: { name: true } },
                 createdAt: true,
             },
             orderBy: {
@@ -93,8 +91,11 @@ let AdminService = class AdminService {
         });
     }
     async deleteTrainer(id) {
-        const user = await this.prisma.user.findUnique({ where: { id } });
-        if (!user || user.role !== client_1.RoleEnum.TRAINER) {
+        const user = await this.prisma.user.findUnique({
+            where: { id },
+            include: { userRole: true }
+        });
+        if (!user || user.userRole?.name !== 'TRAINER') {
             throw new common_1.NotFoundException('Trainer not found');
         }
         return this.prisma.user.update({
@@ -106,8 +107,11 @@ let AdminService = class AdminService {
         });
     }
     async resetTrainerPassword(id, newPassword) {
-        const user = await this.prisma.user.findUnique({ where: { id } });
-        if (!user || user.role !== client_1.RoleEnum.TRAINER) {
+        const user = await this.prisma.user.findUnique({
+            where: { id },
+            include: { userRole: true }
+        });
+        if (!user || user.userRole?.name !== 'TRAINER') {
             throw new common_1.NotFoundException('Trainer not found');
         }
         const hashedPassword = await bcrypt.hash(newPassword, 10);

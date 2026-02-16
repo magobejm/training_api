@@ -8,7 +8,7 @@ async function testDeletion() {
         data: {
             name: 'Test Deletion Obj',
             description: 'Test Description',
-            muscleGroup: 'PECTORAL',
+            muscleGroupId: 'dummy-mg-id',
             defaultVideoUrl: 'http://youtube.com/test',
             defaultImageUrl: 'http://cloudinary.com/test',
         }

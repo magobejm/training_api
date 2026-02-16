@@ -10,7 +10,12 @@ class BodyMetric {
     measurements;
     notes;
     loggedAt;
-    constructor(id, userId, weight, height, bodyFat, measurements, notes, loggedAt) {
+    waist;
+    hips;
+    chest;
+    arm;
+    leg;
+    constructor(id, userId, weight, height, bodyFat, measurements, notes, loggedAt, waist, hips, chest, arm, leg) {
         this.id = id;
         this.userId = userId;
         this.weight = weight;
@@ -19,9 +24,14 @@ class BodyMetric {
         this.measurements = measurements;
         this.notes = notes;
         this.loggedAt = loggedAt;
+        this.waist = waist;
+        this.hips = hips;
+        this.chest = chest;
+        this.arm = arm;
+        this.leg = leg;
     }
-    static create(userId, weight, height, bodyFat, measurements, notes) {
-        return new BodyMetric(crypto.randomUUID(), userId, weight, height || null, bodyFat || null, measurements || null, notes || null, new Date());
+    static create(userId, weight, height, bodyFat, measurements, notes, waist, hips, chest, arm, leg) {
+        return new BodyMetric(crypto.randomUUID(), userId, weight, height || null, bodyFat || null, measurements || null, notes || null, new Date(), waist || null, hips || null, chest || null, arm || null, leg || null);
     }
 }
 exports.BodyMetric = BodyMetric;

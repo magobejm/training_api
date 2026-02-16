@@ -22,7 +22,16 @@ let CreateExerciseUseCase = class CreateExerciseUseCase {
         this.exerciseRepository = exerciseRepository;
     }
     async execute(command) {
-        const exercise = exercise_entity_1.Exercise.create(command.name, command.description, command.muscleGroup, command.videoUrl || null, command.imageUrl || null, command.thumbnailUrl || null, command.userId);
+        const muscleGroups = await this.exerciseRepository.findAllMuscleGroups();
+        const muscleGroupRecord = muscleGroups.find(mg => mg.name === command.muscleGroup);
+        const exercise = exercise_entity_1.Exercise.create(command.name, command.description, command.muscleGroup, command.videoUrl || null, command.imageUrl || null, command.thumbnailUrl || null, command.userId, command.userId);
+        if (muscleGroupRecord) {
+            exercise.muscleGroupDetails = {
+                id: muscleGroupRecord.id,
+                name: muscleGroupRecord.name,
+                imageUrl: muscleGroupRecord.imageUrl
+            };
+        }
         return this.exerciseRepository.create(exercise);
     }
 };

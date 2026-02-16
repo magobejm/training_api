@@ -27,9 +27,8 @@ async function seedUsers() {
         create: {
             email: 'trainer@example.com',
             password: hashedPassword,
-            role: 'TRAINER', // Legacy enum
             roleId: trainerRole.id, // New relation
-        },
+        } as any,
     });
 
     console.log('✅ Created trainer:', trainer.email);
@@ -44,9 +43,8 @@ async function seedUsers() {
         create: {
             email: 'client@example.com',
             password: clientPassword,
-            role: 'CLIENT',
             roleId: clientRole.id,
-        },
+        } as any,
     });
 
     console.log('✅ Created client:', client.email);
@@ -61,9 +59,8 @@ async function seedUsers() {
         create: {
             email: 'admin@example.com',
             password: adminPassword,
-            role: 'ADMIN',
             roleId: adminRole.id,
-        },
+        } as any,
     });
 
     console.log('✅ Created admin:', admin.email);

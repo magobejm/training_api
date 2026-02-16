@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { Role } from '@prisma/client';
+import { RoleEnum } from './domain/role.enum';
 import { UnauthorizedException } from '@nestjs/common';
 
 describe('AuthController', () => {
@@ -43,7 +43,7 @@ describe('AuthController', () => {
     describe('login', () => {
         it('should return token if validation succeeds', async () => {
             const loginDto = { email: 'test@example.com', password: 'password' };
-            const user = { id: '1', email: 'test@example.com', role: Role.CLIENT };
+            const user = { id: '1', email: 'test@example.com', role: RoleEnum.CLIENT };
             const resultToken = { accessToken: 'token', user };
 
             mockAuthService.validateUser.mockResolvedValue(user);
@@ -74,7 +74,7 @@ describe('AuthController', () => {
             const registerDto = {
                 email: 'new@example.com',
                 password: 'password',
-                role: Role.CLIENT,
+                role: RoleEnum.CLIENT,
             };
             const expectedResult = { id: '1', ...registerDto };
 
@@ -83,11 +83,11 @@ describe('AuthController', () => {
             const result = await controller.register(registerDto);
 
             expect(result).toEqual(expectedResult);
-            expect(mockAuthService.register).toHaveBeenCalledWith(
-                registerDto.email,
-                registerDto.password,
-                registerDto.role,
-            );
+            expect(mockAuthService.register).toHaveBeenCalledWith({
+                email: registerDto.email,
+                password: registerDto.password,
+                role: registerDto.role,
+            });
         });
     });
 

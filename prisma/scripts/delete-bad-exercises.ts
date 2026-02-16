@@ -20,7 +20,7 @@ async function main() {
 
     console.log(`Found ${badExercises.length} exercises to delete.`);
     badExercises.forEach(ex => {
-        console.log(`Deleting: [${ex.id}] ${ex.name} (Muscle: ${ex.muscleGroup})`);
+        console.log(`Deleting: [${ex.id}] ${ex.name} (Muscle: ${(ex as any).muscleGroup})`);
     });
 
     if (badExercises.length > 0) {

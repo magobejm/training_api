@@ -5,6 +5,7 @@ import { Exercise } from '../domain/exercise.entity';
 
 const mockExerciseRepository = {
     create: jest.fn(),
+    findAllMuscleGroups: jest.fn(),
 };
 
 describe('CreateExerciseUseCase', () => {
@@ -53,13 +54,21 @@ describe('CreateExerciseUseCase', () => {
             new Date(),
             new Date(),
             createDto.userId,
+            null,
+            null,
+            null,
+            null
         );
 
+        mockExerciseRepository.findAllMuscleGroups.mockResolvedValue([
+            { id: 'mg-1', name: 'CHEST', imageUrl: null }
+        ]);
         mockExerciseRepository.create.mockResolvedValue(createdExercise);
 
         const result = await service.execute(createDto);
 
         expect(result).toEqual(createdExercise);
+        expect(mockExerciseRepository.findAllMuscleGroups).toHaveBeenCalled();
         expect(mockExerciseRepository.create).toHaveBeenCalledWith(
             expect.objectContaining({
                 name: createDto.name,

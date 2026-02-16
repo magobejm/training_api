@@ -8,7 +8,7 @@ export class DashboardService {
 
     async getTrainerStats(trainerId: string): Promise<TrainerStats> {
         const [totalClients, totalExercises, totalPlans, sessionsToday] = await Promise.all([
-            this.prisma.user.count({ where: { role: 'CLIENT', deletedAt: null } }),
+            this.prisma.user.count({ where: { userRole: { name: 'CLIENT' }, deletedAt: null } }),
             this.prisma.exercise.count({ where: { deletedAt: null } }),
             this.prisma.trainingPlan.count({ where: { deletedAt: null } }),
             this.prisma.scheduledWorkout.count({

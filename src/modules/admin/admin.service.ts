@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { RoleEnum } from '@prisma/client';
+import { RoleEnum } from '../auth/domain/role.enum';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -29,9 +29,8 @@ export class AdminService {
             data: {
                 email,
                 password: hashedPassword,
-                role: RoleEnum.TRAINER,
-                roleId: roleRecord?.id,
-            },
+                roleId: roleRecord?.id as string,
+            } as any,
         });
 
         const { password: _, ...result } = user;
@@ -41,13 +40,13 @@ export class AdminService {
     async getAllTrainers() {
         return this.prisma.user.findMany({
             where: {
-                role: RoleEnum.TRAINER,
+                userRole: { name: 'TRAINER' },
                 deletedAt: null,
             },
             select: {
                 id: true,
                 email: true,
-                role: true,
+                userRole: { select: { name: true } },
                 createdAt: true,
                 // Don't select password
             },
@@ -58,8 +57,11 @@ export class AdminService {
     }
 
     async deleteTrainer(id: string) {
-        const user = await this.prisma.user.findUnique({ where: { id } });
-        if (!user || user.role !== RoleEnum.TRAINER) {
+        const user = await this.prisma.user.findUnique({
+            where: { id },
+            include: { userRole: true }
+        });
+        if (!user || (user as any).userRole?.name !== 'TRAINER') {
             throw new NotFoundException('Trainer not found');
         }
 
@@ -73,8 +75,11 @@ export class AdminService {
     }
 
     async resetTrainerPassword(id: string, newPassword: string) {
-        const user = await this.prisma.user.findUnique({ where: { id } });
-        if (!user || user.role !== RoleEnum.TRAINER) {
+        const user = await this.prisma.user.findUnique({
+            where: { id },
+            include: { userRole: true }
+        });
+        if (!user || (user as any).userRole?.name !== 'TRAINER') {
             throw new NotFoundException('Trainer not found');
         }
 

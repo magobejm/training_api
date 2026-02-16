@@ -9,7 +9,7 @@ async function checkUser() {
     if (user) {
         console.log('✅ Usuario encontrado:');
         console.log('  Email:', user.email);
-        console.log('  Role:', user.role);
+        console.log('  Role:', user.role || 'N/A');
         console.log('  Password hash:', user.password ? 'EXISTS' : 'NULL');
         console.log('  ID:', user.id);
     }

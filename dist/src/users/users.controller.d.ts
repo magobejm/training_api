@@ -8,12 +8,13 @@ export declare class UsersController {
             id: string;
             name: string;
             description: string | null;
-        } | null;
+        };
         userRole: undefined;
         id: string;
         email: string;
         name: string | null;
         avatarUrl: string | null;
+        phone: string | null;
         createdAt: Date;
         updatedAt: Date;
         activePlan: {
@@ -26,8 +27,10 @@ export declare class UsersController {
             id: string;
             name: string;
             description: string | null;
-        } | null;
+        };
         userRole: undefined;
+        completedWorkouts: number;
+        _count: undefined;
         id: string;
         email: string;
         name: string | null;
@@ -39,6 +42,7 @@ export declare class UsersController {
         maxHeartRate: number | null;
         restingHeartRate: number | null;
         leanMass: number | null;
+        phone: string | null;
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
@@ -58,12 +62,14 @@ export declare class UsersController {
         maxHeartRate?: number;
         restingHeartRate?: number;
         leanMass?: number;
+        phone?: string;
+        goal?: string;
     }): Promise<{
         role: {
             id: string;
             name: string;
             description: string | null;
-        } | null;
+        };
         userRole: undefined;
         id: string;
         email: string;
@@ -76,6 +82,8 @@ export declare class UsersController {
         maxHeartRate: number | null;
         restingHeartRate: number | null;
         leanMass: number | null;
+        phone: string | null;
+        goal: string | null;
     }>;
     assignPlan(id: string, body: {
         planId: string | null;
@@ -96,12 +104,14 @@ export declare class UsersController {
         maxHeartRate?: number;
         restingHeartRate?: number;
         leanMass?: number;
+        phone?: string;
+        goal?: string;
     }): Promise<{
         role: {
             id: string;
             name: string;
             description: string | null;
-        } | null;
+        };
         userRole: undefined;
         id: string;
         email: string;
@@ -114,6 +124,8 @@ export declare class UsersController {
         maxHeartRate: number | null;
         restingHeartRate: number | null;
         leanMass: number | null;
+        phone: string | null;
+        goal: string | null;
     }>;
     softDelete(id: string, req: any): Promise<{
         message: string;

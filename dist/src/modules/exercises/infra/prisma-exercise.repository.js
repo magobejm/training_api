@@ -24,7 +24,6 @@ let PrismaExerciseRepository = class PrismaExerciseRepository {
                 id: exercise.id,
                 name: exercise.name,
                 description: exercise.description,
-                muscleGroup: exercise.muscleGroup,
                 defaultVideoUrl: exercise.defaultVideoUrl,
                 defaultImageUrl: exercise.defaultImageUrl,
                 thumbnailUrl: exercise.thumbnailUrl,
@@ -33,6 +32,7 @@ let PrismaExerciseRepository = class PrismaExerciseRepository {
                 createdBy: exercise.createdBy,
                 updatedBy: exercise.updatedBy,
                 muscleGroupId: exercise.muscleGroupDetails?.id,
+                trainerId: exercise.trainerId,
             },
             include: {
                 targetMuscleGroup: true,
@@ -40,9 +40,15 @@ let PrismaExerciseRepository = class PrismaExerciseRepository {
         });
         return this.mapToDomain(raw);
     }
-    async findAll() {
+    async findAll(userId) {
         const raw = await this.prisma.exercise.findMany({
-            where: { deletedAt: null },
+            where: {
+                deletedAt: null,
+                OR: [
+                    { trainerId: null },
+                    { trainerId: userId },
+                ],
+            },
             include: {
                 targetMuscleGroup: true,
             },
@@ -66,12 +72,12 @@ let PrismaExerciseRepository = class PrismaExerciseRepository {
             data: {
                 name: data.name,
                 description: data.description,
-                muscleGroup: data.muscleGroup,
                 defaultVideoUrl: data.defaultVideoUrl,
                 defaultImageUrl: data.defaultImageUrl,
                 thumbnailUrl: data.thumbnailUrl,
                 updatedAt: new Date(),
                 updatedBy: data.updatedBy,
+                muscleGroupId: data.muscleGroupDetails?.id,
             },
             include: {
                 targetMuscleGroup: true,
@@ -82,34 +88,29 @@ let PrismaExerciseRepository = class PrismaExerciseRepository {
     async delete(id) {
         await this.prisma.exercise.update({
             where: { id },
-            data: {
-                deletedAt: new Date(),
-            },
+            data: { deletedAt: new Date() },
         });
     }
     async findAllByIds(ids) {
         const raw = await this.prisma.exercise.findMany({
-            where: {
-                id: { in: ids },
-                deletedAt: null,
-            },
-            include: {
-                targetMuscleGroup: true,
-            },
+            where: { id: { in: ids }, deletedAt: null },
+            include: { targetMuscleGroup: true },
         });
         return raw.map((item) => this.mapToDomain(item));
     }
     async hasDayExercises(id) {
         const count = await this.prisma.dayExercise.count({
-            where: {
-                exerciseId: id,
-                deletedAt: null,
-            },
+            where: { exerciseId: id },
         });
         return count > 0;
     }
+    async findAllMuscleGroups() {
+        return this.prisma.muscleGroup.findMany({
+            orderBy: { name: 'asc' },
+        });
+    }
     mapToDomain(raw) {
-        return new exercise_entity_1.Exercise(raw.id, raw.name, raw.description, raw.muscleGroup, raw.defaultVideoUrl, raw.defaultImageUrl, raw.thumbnailUrl, raw.createdAt, raw.updatedAt, raw.createdBy, raw.updatedBy, raw.deletedAt, raw.deletedBy, raw.targetMuscleGroup ? {
+        return new exercise_entity_1.Exercise(raw.id, raw.name, raw.description, raw.targetMuscleGroup?.name || 'UNKNOWN', raw.defaultVideoUrl, raw.defaultImageUrl, raw.thumbnailUrl, raw.createdAt, raw.updatedAt, raw.createdBy, raw.updatedBy, raw.deletedAt, raw.deletedBy, raw.trainerId, raw.targetMuscleGroup ? {
             id: raw.targetMuscleGroup.id,
             name: raw.targetMuscleGroup.name,
             imageUrl: raw.targetMuscleGroup.imageUrl

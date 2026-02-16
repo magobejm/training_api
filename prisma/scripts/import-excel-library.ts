@@ -87,10 +87,9 @@ async function main() {
                     where: { id: existing.id },
                     data: {
                         defaultVideoUrl: videoUrl || null,
-                        muscleGroup: targetMuscleName,
                         muscleGroupId: muscleGroupId,
                         description: `Ejercicio de ${targetMuscleName}`,
-                    }
+                    } as any
                 });
                 updatedCount++;
             } else {
@@ -98,10 +97,9 @@ async function main() {
                     data: {
                         name,
                         defaultVideoUrl: videoUrl || null,
-                        muscleGroup: targetMuscleName,
                         muscleGroupId: muscleGroupId,
                         description: `Ejercicio de ${targetMuscleName}`,
-                    }
+                    } as any
                 });
                 createdCount++;
             }

@@ -73,12 +73,10 @@ async function importExercises() {
                     create: {
                         name,
                         description: 'Importado de Excel',
-                        muscleGroup: muscleGroupName,
                         muscleGroupId: muscleGroup.id,
                         defaultVideoUrl: videoUrl,
                     },
                     update: {
-                        muscleGroup: muscleGroupName,
                         muscleGroupId: muscleGroup.id,
                         defaultVideoUrl: videoUrl,
                     }
@@ -89,7 +87,6 @@ async function importExercises() {
                             where: { id: existing.id },
                             data: {
                                 muscleGroupId: muscleGroup.id,
-                                muscleGroup: muscleGroupName,
                                 defaultVideoUrl: videoUrl
                             }
                         });
@@ -100,7 +97,6 @@ async function importExercises() {
                             data: {
                                 name,
                                 description: 'Importado de Excel',
-                                muscleGroup: muscleGroupName,
                                 muscleGroupId: muscleGroup.id,
                                 defaultVideoUrl: videoUrl,
                             }
@@ -117,7 +113,6 @@ async function importExercises() {
                         data: {
                             name,
                             description: 'Importado de Excel',
-                            muscleGroup: muscleNameRaw || 'OTHER',
                             defaultVideoUrl: videoUrl,
                         }
                     });
@@ -145,7 +140,6 @@ async function importExercises() {
                         data: {
                             name,
                             description: 'Ejercicio de cardio',
-                            muscleGroup: 'CARDIO',
                             muscleGroupId: cardioGroup.id,
                         }
                     });

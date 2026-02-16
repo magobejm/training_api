@@ -20,8 +20,8 @@ let GetExercisesUseCase = class GetExercisesUseCase {
     constructor(exerciseRepository) {
         this.exerciseRepository = exerciseRepository;
     }
-    async execute() {
-        return this.exerciseRepository.findAll();
+    async execute(userId) {
+        return this.exerciseRepository.findAll(userId);
     }
 };
 exports.GetExercisesUseCase = GetExercisesUseCase;

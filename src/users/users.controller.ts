@@ -30,6 +30,7 @@ export class UsersController {
                 updatedAt: true,
                 name: true,
                 avatarUrl: true,
+                phone: true,
                 activePlan: {
                     select: {
                         id: true,
@@ -68,6 +69,7 @@ export class UsersController {
                 deletedAt: true,
                 name: true,
                 avatarUrl: true,
+                phone: true,
                 birthDate: true,
                 gender: true,
                 height: true,
@@ -81,6 +83,13 @@ export class UsersController {
                         name: true,
                         description: true,
                     }
+                },
+                _count: {
+                    select: {
+                        workoutSessions: {
+                            where: { status: 'COMPLETED' }
+                        }
+                    }
                 }
             },
         });
@@ -93,6 +102,8 @@ export class UsersController {
             ...user,
             role: user.userRole,
             userRole: undefined,
+            completedWorkouts: user._count.workoutSessions,
+            _count: undefined,
         };
     }
 
@@ -109,6 +120,8 @@ export class UsersController {
             maxHeartRate?: number;
             restingHeartRate?: number;
             leanMass?: number;
+            phone?: string;
+            goal?: string;
         },
     ) {
         const result = await this.prisma.user.update({
@@ -123,6 +136,8 @@ export class UsersController {
                 maxHeartRate: body.maxHeartRate,
                 restingHeartRate: body.restingHeartRate,
                 leanMass: body.leanMass,
+                phone: body.phone,
+                goal: body.goal,
             },
             select: {
                 id: true,
@@ -143,6 +158,8 @@ export class UsersController {
                 maxHeartRate: true,
                 restingHeartRate: true,
                 leanMass: true,
+                phone: true,
+                goal: true,
             },
         });
 
@@ -198,6 +215,8 @@ export class UsersController {
             maxHeartRate?: number;
             restingHeartRate?: number;
             leanMass?: number;
+            phone?: string;
+            goal?: string;
         },
     ) {
         const result = await this.prisma.user.update({
@@ -212,6 +231,8 @@ export class UsersController {
                 maxHeartRate: body.maxHeartRate,
                 restingHeartRate: body.restingHeartRate,
                 leanMass: body.leanMass,
+                phone: body.phone,
+                goal: body.goal,
             },
             select: {
                 id: true,
@@ -232,6 +253,8 @@ export class UsersController {
                 maxHeartRate: true,
                 restingHeartRate: true,
                 leanMass: true,
+                phone: true,
+                goal: true,
             },
         });
 
