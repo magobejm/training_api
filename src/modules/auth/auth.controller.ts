@@ -4,7 +4,7 @@ import { RoleEnum } from './domain/role.enum';
 import { Roles } from './decorators/roles.decorator';
 import { RolesGuard } from './guards/roles.guard';
 import { Public } from './decorators/public.decorator';
-import { IsEnum, IsString, IsOptional, MinLength, IsEmail } from 'class-validator';
+import { IsEnum, IsString, IsOptional, MinLength, IsEmail, IsNumber } from 'class-validator';
 
 class RegisterDto {
   @IsEmail()
@@ -14,9 +14,23 @@ class RegisterDto {
   @MinLength(6)
   password: string;
 
-  @IsOptional()
   @IsString()
-  name?: string;
+  name: string;
+
+  @IsString()
+  phone: string;
+
+  @IsString()
+  goal: string;
+
+  @IsString()
+  birthDate: string; // ISO format
+
+  @IsNumber()
+  height: number;
+
+  @IsNumber()
+  weight: number;
 
   @IsOptional()
   @IsEnum(RoleEnum)
@@ -24,15 +38,11 @@ class RegisterDto {
 
   @IsOptional()
   @IsString()
-  phone?: string;
-
-  @IsOptional()
-  @IsString()
-  goal?: string;
-
-  @IsOptional()
-  @IsString()
   avatarUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  trainerId?: string;
 }
 
 class LoginDto {
@@ -87,7 +97,13 @@ export class AuthController {
   }
 
   @Post('register')
-  async register(@Body() body: RegisterDto) {
+  async register(@Body() body: RegisterDto, @Request() req: any) {
+    // If a trainer is registering a client, associate it automatically
+    let trainerId = body.trainerId;
+    if (req.user?.role === 'TRAINER') {
+      trainerId = req.user.userId;
+    }
+
     return this.authService.register({
       email: body.email,
       password: body.password,
@@ -96,6 +112,10 @@ export class AuthController {
       phone: body.phone,
       goal: body.goal,
       avatarUrl: body.avatarUrl,
+      trainerId: trainerId,
+      birthDate: (body as any).birthDate,
+      height: (body as any).height,
+      weight: (body as any).weight,
     });
   }
 

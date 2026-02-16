@@ -3,11 +3,15 @@ import { RoleEnum } from './domain/role.enum';
 declare class RegisterDto {
     email: string;
     password: string;
-    name?: string;
+    name: string;
+    phone: string;
+    goal: string;
+    birthDate: string;
+    height: number;
+    weight: number;
     role: RoleEnum;
-    phone?: string;
-    goal?: string;
     avatarUrl?: string;
+    trainerId?: string;
 }
 declare class LoginDto {
     email: string;
@@ -37,11 +41,12 @@ export declare class AuthController {
             avatarUrl: any;
         };
     }>;
-    register(body: RegisterDto): Promise<{
+    register(body: RegisterDto, req: any): Promise<{
         id: any;
         email: any;
         name: any;
         role: any;
+        trainerId: any;
     }>;
     changePassword(req: any, body: ChangePasswordDto): Promise<{
         message: string;

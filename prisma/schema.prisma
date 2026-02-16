@@ -88,6 +88,11 @@ model User {
   phone            String?
   goal             String?
 
+  // Trainer Association
+  trainerId     String? @map("trainer_id")
+  trainer       User?   @relation("TrainerToClient", fields: [trainerId], references: [id])
+  clients       User[]  @relation("TrainerToClient")
+
   // Relations
   trainingPlans            TrainingPlan[]     @relation("CreatedPlans")
   workoutSessions          WorkoutSession[]

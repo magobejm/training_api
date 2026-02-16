@@ -24,11 +24,16 @@ export declare class AuthService {
         avatarUrl?: string;
         phone?: string;
         goal?: string;
+        trainerId?: string;
+        birthDate?: string;
+        height?: number;
+        weight?: number;
     }): Promise<{
         id: any;
         email: any;
         name: any;
         role: any;
+        trainerId: any;
     }>;
     changePassword(userId: string, oldPass: string, newPass: string): Promise<{
         message: string;

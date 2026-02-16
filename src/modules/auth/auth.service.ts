@@ -33,14 +33,26 @@ export class AuthService {
         id: userWithoutPassword.id,
         email: userWithoutPassword.email,
         name: userWithoutPassword.name,
-        role: userWithoutPassword.userRole || { name: userWithoutPassword.role },
+        role: userRole || { name: (userWithoutPassword as any).role },
         avatarUrl: userWithoutPassword.avatarUrl,
       },
     };
   }
 
-  async register(registerDto: { email: string; password: string; name?: string; role: RoleEnum; avatarUrl?: string, phone?: string, goal?: string }) {
-    const { email, password, name, role, avatarUrl, phone, goal } = registerDto;
+  async register(registerDto: {
+    email: string;
+    password: string;
+    name?: string;
+    role: RoleEnum;
+    avatarUrl?: string;
+    phone?: string;
+    goal?: string;
+    trainerId?: string;
+    birthDate?: string;
+    height?: number;
+    weight?: number;
+  }) {
+    const { email, password, name, role, avatarUrl, phone, goal, trainerId, birthDate, height, weight } = registerDto;
     // Check if user exists (including soft-deleted)
     const existingUser = await this.prisma.user.findUnique({
       where: { email },
@@ -59,15 +71,17 @@ export class AuthService {
         where: { email },
         data: {
           password: hashedPassword,
-          name: name || existingUser.name, // Keep existing name if not provided
+          name: name || existingUser.name,
           avatarUrl: avatarUrl || existingUser.avatarUrl,
           phone: phone || existingUser.phone,
           goal: goal || existingUser.goal,
+          trainerId: trainerId || existingUser.trainerId,
+          birthDate: birthDate ? new Date(birthDate) : existingUser.birthDate,
+          height: height || existingUser.height,
+          weight: weight || existingUser.weight,
           deletedAt: null,
           deletedBy: null,
           updatedAt: new Date(),
-          // role: role, // Removed legacy column update, reliance on relation handled below if we wanted to change role?
-          // For now assuming role doesn't change on reactivation unless specified.
         },
         include: { userRole: true }
       }) as any;
@@ -77,6 +91,7 @@ export class AuthService {
         email: reactivatedUser.email,
         name: reactivatedUser.name,
         role: reactivatedUser.userRole || { name: role || RoleEnum.CLIENT },
+        trainerId: reactivatedUser.trainerId,
       };
     }
 
@@ -90,11 +105,15 @@ export class AuthService {
       data: {
         email,
         password: hashedPassword,
-        name: name || email.split('@')[0], // Default name
+        name: name || email.split('@')[0],
         avatarUrl,
         phone,
         goal,
+        birthDate: birthDate ? new Date(birthDate) : undefined,
+        height,
+        weight,
         roleId: userRole?.id as string,
+        trainerId: trainerId,
       } as any,
       include: { userRole: true }
     }) as any;
@@ -104,6 +123,7 @@ export class AuthService {
       email: user.email,
       name: user.name,
       role: user.userRole || { name: role || RoleEnum.CLIENT },
+      trainerId: user.trainerId,
     };
   }
 

@@ -3,18 +3,24 @@ import { Gender } from '@prisma/client';
 export declare class UsersController {
     private prisma;
     constructor(prisma: PrismaService);
-    findAll(): Promise<{
+    findAll(user: any): Promise<{
         role: {
             id: string;
             name: string;
             description: string | null;
         };
         userRole: undefined;
+        completedSessionsCount: number;
+        _count: undefined;
         id: string;
         email: string;
         name: string | null;
         avatarUrl: string | null;
+        birthDate: Date | null;
+        height: number | null;
+        weight: number | null;
         phone: string | null;
+        goal: string | null;
         createdAt: Date;
         updatedAt: Date;
         activePlan: {
@@ -22,7 +28,7 @@ export declare class UsersController {
             name: string;
         } | null;
     }[]>;
-    findOne(id: string): Promise<{
+    findOne(id: string, user: any): Promise<{
         role: {
             id: string;
             name: string;
@@ -94,7 +100,7 @@ export declare class UsersController {
             name: string;
         } | null;
     }>;
-    update(id: string, body: {
+    update(id: string, currentUser: any, body: {
         name?: string;
         avatarUrl?: string;
         birthDate?: string;
@@ -107,25 +113,9 @@ export declare class UsersController {
         phone?: string;
         goal?: string;
     }): Promise<{
-        role: {
-            id: string;
-            name: string;
-            description: string | null;
-        };
+        role: any;
         userRole: undefined;
-        id: string;
-        email: string;
-        name: string | null;
-        avatarUrl: string | null;
-        birthDate: Date | null;
-        gender: import("@prisma/client").$Enums.Gender | null;
-        height: number | null;
-        weight: number | null;
-        maxHeartRate: number | null;
-        restingHeartRate: number | null;
-        leanMass: number | null;
-        phone: string | null;
-        goal: string | null;
+        count: number;
     }>;
     softDelete(id: string, req: any): Promise<{
         message: string;

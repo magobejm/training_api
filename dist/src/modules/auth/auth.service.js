@@ -74,13 +74,13 @@ let AuthService = class AuthService {
                 id: userWithoutPassword.id,
                 email: userWithoutPassword.email,
                 name: userWithoutPassword.name,
-                role: userWithoutPassword.userRole || { name: userWithoutPassword.role },
+                role: userRole || { name: userWithoutPassword.role },
                 avatarUrl: userWithoutPassword.avatarUrl,
             },
         };
     }
     async register(registerDto) {
-        const { email, password, name, role, avatarUrl, phone, goal } = registerDto;
+        const { email, password, name, role, avatarUrl, phone, goal, trainerId, birthDate, height, weight } = registerDto;
         const existingUser = await this.prisma.user.findUnique({
             where: { email },
         });
@@ -97,6 +97,10 @@ let AuthService = class AuthService {
                     avatarUrl: avatarUrl || existingUser.avatarUrl,
                     phone: phone || existingUser.phone,
                     goal: goal || existingUser.goal,
+                    trainerId: trainerId || existingUser.trainerId,
+                    birthDate: birthDate ? new Date(birthDate) : existingUser.birthDate,
+                    height: height || existingUser.height,
+                    weight: weight || existingUser.weight,
                     deletedAt: null,
                     deletedBy: null,
                     updatedAt: new Date(),
@@ -108,6 +112,7 @@ let AuthService = class AuthService {
                 email: reactivatedUser.email,
                 name: reactivatedUser.name,
                 role: reactivatedUser.userRole || { name: role || role_enum_1.RoleEnum.CLIENT },
+                trainerId: reactivatedUser.trainerId,
             };
         }
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -122,7 +127,11 @@ let AuthService = class AuthService {
                 avatarUrl,
                 phone,
                 goal,
+                birthDate: birthDate ? new Date(birthDate) : undefined,
+                height,
+                weight,
                 roleId: userRole?.id,
+                trainerId: trainerId,
             },
             include: { userRole: true }
         });
@@ -131,6 +140,7 @@ let AuthService = class AuthService {
             email: user.email,
             name: user.name,
             role: user.userRole || { name: role || role_enum_1.RoleEnum.CLIENT },
+            trainerId: user.trainerId,
         };
     }
     async changePassword(userId, oldPass, newPass) {

@@ -22,10 +22,17 @@ let UsersController = class UsersController {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async findAll() {
+    async findAll(user) {
+        const where = {
+            deletedAt: null,
+        };
+        if (user.role === 'TRAINER') {
+            where.trainerId = user.userId;
+        }
         const users = await this.prisma.user.findMany({
-            where: {
-                deletedAt: null,
+            where,
+            orderBy: {
+                name: 'asc'
             },
             select: {
                 id: true,
@@ -42,10 +49,26 @@ let UsersController = class UsersController {
                 name: true,
                 avatarUrl: true,
                 phone: true,
+                birthDate: true,
+                goal: true,
+                height: true,
+                weight: true,
                 activePlan: {
                     select: {
                         id: true,
                         name: true,
+                    },
+                },
+                _count: {
+                    select: {
+                        workoutSessions: {
+                            where: {
+                                status: 'COMPLETED',
+                                completedAt: {
+                                    gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+                                },
+                            },
+                        },
                     },
                 },
             },
@@ -54,11 +77,17 @@ let UsersController = class UsersController {
             ...user,
             role: user.userRole,
             userRole: undefined,
+            completedSessionsCount: user._count?.workoutSessions || 0,
+            _count: undefined,
         }));
     }
-    async findOne(id) {
-        const user = await this.prisma.user.findUnique({
-            where: { id },
+    async findOne(id, user) {
+        const where = { id };
+        if (user.role === 'TRAINER') {
+            where.trainerId = user.userId;
+        }
+        const foundUser = await this.prisma.user.findFirst({
+            where,
             select: {
                 id: true,
                 email: true,
@@ -98,14 +127,14 @@ let UsersController = class UsersController {
                 }
             },
         });
-        if (!user || user.deletedAt) {
+        if (!foundUser || foundUser.deletedAt) {
             throw new common_1.NotFoundException('User not found');
         }
         return {
-            ...user,
-            role: user.userRole,
+            ...foundUser,
+            role: foundUser.userRole,
             userRole: undefined,
-            completedWorkouts: user._count.workoutSessions,
+            completedWorkouts: foundUser._count.workoutSessions,
             _count: undefined,
         };
     }
@@ -178,9 +207,13 @@ let UsersController = class UsersController {
             }
         });
     }
-    async update(id, body) {
-        const result = await this.prisma.user.update({
-            where: { id },
+    async update(id, currentUser, body) {
+        const where = { id };
+        if (currentUser.role === 'TRAINER') {
+            where.trainerId = currentUser.userId;
+        }
+        const result = await this.prisma.user.updateMany({
+            where,
             data: {
                 name: body.name,
                 avatarUrl: body.avatarUrl,
@@ -194,6 +227,12 @@ let UsersController = class UsersController {
                 phone: body.phone,
                 goal: body.goal,
             },
+        });
+        if (result.count === 0) {
+            throw new common_1.NotFoundException('User not found or access denied');
+        }
+        const updatedUser = await this.prisma.user.findUnique({
+            where: { id },
             select: {
                 id: true,
                 email: true,
@@ -238,15 +277,17 @@ let UsersController = class UsersController {
 exports.UsersController = UsersController;
 __decorate([
     (0, common_1.Get)(),
+    __param(0, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "findOne", null);
 __decorate([
@@ -268,9 +309,10 @@ __decorate([
 __decorate([
     (0, common_1.Patch)(':id'),
     __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
+    __param(1, (0, current_user_decorator_1.CurrentUser)()),
+    __param(2, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, Object, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "update", null);
 __decorate([

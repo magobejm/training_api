@@ -19,6 +19,7 @@ export declare class AdminService {
         leanMass: number | null;
         phone: string | null;
         goal: string | null;
+        trainerId: string | null;
         activePlanId: string | null;
         createdAt: Date;
         updatedAt: Date;
@@ -55,6 +56,7 @@ export declare class AdminService {
         leanMass: number | null;
         phone: string | null;
         goal: string | null;
+        trainerId: string | null;
         activePlanId: string | null;
         createdAt: Date;
         updatedAt: Date;

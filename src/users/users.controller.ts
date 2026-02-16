@@ -10,16 +10,25 @@ export class UsersController {
     constructor(private prisma: PrismaService) { }
 
     @Get()
-    async findAll() {
+    async findAll(@CurrentUser() user: any) {
+        const where: any = {
+            deletedAt: null,
+        };
+
+        // Privacy: Trainers only see their own clients
+        if (user.role === 'TRAINER') {
+            where.trainerId = user.userId;
+        }
+
         const users = await this.prisma.user.findMany({
-            where: {
-                deletedAt: null, // Only active users
+            where,
+            orderBy: {
+                name: 'asc'
             },
             select: {
                 id: true,
                 email: true,
-                // role: true, // Deprecated Enum
-                userRole: { // New Relation
+                userRole: {
                     select: {
                         id: true,
                         name: true,
@@ -31,28 +40,53 @@ export class UsersController {
                 name: true,
                 avatarUrl: true,
                 phone: true,
+                birthDate: true,
+                goal: true,
+                height: true,
+                weight: true,
                 activePlan: {
                     select: {
                         id: true,
                         name: true,
                     },
                 },
+                _count: {
+                    select: {
+                        workoutSessions: {
+                            where: {
+                                status: 'COMPLETED',
+                                completedAt: {
+                                    gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+                                },
+                            },
+                        },
+                    },
+                },
             },
         });
 
-        // Map userRole to role
+        // Map userRole to role and flatten _count
         return users.map(user => ({
             ...user,
             role: user.userRole,
             userRole: undefined,
+            completedSessionsCount: user._count?.workoutSessions || 0,
+            _count: undefined,
         }));
     }
 
 
     @Get(':id')
-    async findOne(@Param('id') id: string) {
-        const user = await this.prisma.user.findUnique({
-            where: { id },
+    async findOne(@Param('id') id: string, @CurrentUser() user: any) {
+        const where: any = { id };
+
+        // Privacy
+        if (user.role === 'TRAINER') {
+            where.trainerId = user.userId;
+        }
+
+        const foundUser = await this.prisma.user.findFirst({
+            where,
             select: {
                 id: true,
                 email: true,
@@ -94,15 +128,15 @@ export class UsersController {
             },
         });
 
-        if (!user || user.deletedAt) {
+        if (!foundUser || foundUser.deletedAt) {
             throw new NotFoundException('User not found');
         }
 
         return {
-            ...user,
-            role: user.userRole,
+            ...foundUser,
+            role: foundUser.userRole,
             userRole: undefined,
-            completedWorkouts: user._count.workoutSessions,
+            completedWorkouts: foundUser._count.workoutSessions,
             _count: undefined,
         };
     }
@@ -205,6 +239,7 @@ export class UsersController {
     @Patch(':id')
     async update(
         @Param('id') id: string,
+        @CurrentUser() currentUser: any,
         @Body() body: {
             name?: string;
             avatarUrl?: string;
@@ -219,8 +254,13 @@ export class UsersController {
             goal?: string;
         },
     ) {
-        const result = await this.prisma.user.update({
-            where: { id },
+        const where: any = { id };
+        if (currentUser.role === 'TRAINER') {
+            where.trainerId = currentUser.userId;
+        }
+
+        const result = await this.prisma.user.updateMany({
+            where,
             data: {
                 name: body.name,
                 avatarUrl: body.avatarUrl,
@@ -234,6 +274,14 @@ export class UsersController {
                 phone: body.phone,
                 goal: body.goal,
             },
+        });
+
+        if (result.count === 0) {
+            throw new NotFoundException('User not found or access denied');
+        }
+
+        const updatedUser = await this.prisma.user.findUnique({
+            where: { id },
             select: {
                 id: true,
                 email: true,

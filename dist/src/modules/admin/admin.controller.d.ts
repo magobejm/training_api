@@ -26,6 +26,7 @@ export declare class AdminController {
         leanMass: number | null;
         phone: string | null;
         goal: string | null;
+        trainerId: string | null;
         activePlanId: string | null;
         createdAt: Date;
         updatedAt: Date;
@@ -62,6 +63,7 @@ export declare class AdminController {
         leanMass: number | null;
         phone: string | null;
         goal: string | null;
+        trainerId: string | null;
         activePlanId: string | null;
         createdAt: Date;
         updatedAt: Date;

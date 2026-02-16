@@ -21,10 +21,14 @@ class RegisterDto {
     email;
     password;
     name;
-    role;
     phone;
     goal;
+    birthDate;
+    height;
+    weight;
+    role;
     avatarUrl;
+    trainerId;
 }
 __decorate([
     (0, class_validator_1.IsEmail)(),
@@ -36,10 +40,29 @@ __decorate([
     __metadata("design:type", String)
 ], RegisterDto.prototype, "password", void 0);
 __decorate([
-    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "name", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], RegisterDto.prototype, "phone", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], RegisterDto.prototype, "goal", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], RegisterDto.prototype, "birthDate", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], RegisterDto.prototype, "height", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], RegisterDto.prototype, "weight", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsEnum)(role_enum_1.RoleEnum),
@@ -49,17 +72,12 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], RegisterDto.prototype, "phone", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], RegisterDto.prototype, "goal", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
 ], RegisterDto.prototype, "avatarUrl", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], RegisterDto.prototype, "trainerId", void 0);
 class LoginDto {
     email;
     password;
@@ -119,7 +137,11 @@ let AuthController = class AuthController {
         }
         return this.authService.login(validUser);
     }
-    async register(body) {
+    async register(body, req) {
+        let trainerId = body.trainerId;
+        if (req.user?.role === 'TRAINER') {
+            trainerId = req.user.userId;
+        }
         return this.authService.register({
             email: body.email,
             password: body.password,
@@ -128,6 +150,10 @@ let AuthController = class AuthController {
             phone: body.phone,
             goal: body.goal,
             avatarUrl: body.avatarUrl,
+            trainerId: trainerId,
+            birthDate: body.birthDate,
+            height: body.height,
+            weight: body.weight,
         });
     }
     async changePassword(req, body) {
@@ -154,8 +180,9 @@ __decorate([
 __decorate([
     (0, common_1.Post)('register'),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [RegisterDto]),
+    __metadata("design:paramtypes", [RegisterDto, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "register", null);
 __decorate([
